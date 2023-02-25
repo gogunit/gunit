@@ -1,6 +1,6 @@
 package gunit
 
-type test interface {
+type T interface {
 	Helper()
 	Errorf(format string, args ...any)
 }
