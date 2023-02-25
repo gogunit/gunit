@@ -7,12 +7,22 @@
 
 Go unit test assertions library.
 
-## Example
+## Examples
 
 ```go
+// direct assertion style
 func Test_nine_plus_two_is_greater_than_ten(t *testing.T) {
 	actual := 9 + 2
 	expected := 10
-	Number(t, actual).GreaterThan(expected)
+	gunit.Number(t, actual).GreaterThan(expected)
 }
+
+// wrap testing.T struct
+func Test_nine_plus_two_is_greater_than_ten(t *testing.T) {
+	assert := gunit.New(t)
+	actual := 9 + 2
+	expected := 10
+	assert.Int(actual).GreaterThan(expected)
+}
+
 ```
