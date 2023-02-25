@@ -9,8 +9,8 @@ Go unit test assertions library.
 
 ```go
 func Test_nine_plus_two_is_greater_than_ten(t *testing.T) {
-  actual := 9 + 2
-  expected := 10
+	actual := 9 + 2
+	expected := 10
 	Number(t, actual).GreaterThan(expected)
 }
 ```
