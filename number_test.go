@@ -5,6 +5,35 @@ import (
 	"testing"
 )
 
+func TestNumber_subtypes(t *testing.T) {
+	type (
+		MyInt     int
+		MyInt8    int8
+		MyInt16   int16
+		MyInt32   int32
+		MyInt64   int64
+		MyUint    uint
+		MyUint8   uint8
+		MyUint16  uint16
+		MyUint32  uint32
+		MyUint64  uint64
+		MyFloat32 float32
+		MyFloat64 float64
+	)
+	Number(t, MyInt(42)).EqualTo(42)
+	Number(t, MyInt8(42)).EqualTo(42)
+	Number(t, MyInt16(42)).EqualTo(42)
+	Number(t, MyInt32(42)).EqualTo(42)
+	Number(t, MyInt64(42)).EqualTo(42)
+	Number(t, MyUint(42)).EqualTo(42)
+	Number(t, MyUint8(42)).EqualTo(42)
+	Number(t, MyUint16(42)).EqualTo(42)
+	Number(t, MyUint32(42)).EqualTo(42)
+	Number(t, MyUint64(42)).EqualTo(42)
+	Number(t, MyFloat32(42)).EqualTo(42)
+	Number(t, MyFloat64(42)).EqualTo(42)
+}
+
 func Test_int32_EqualTo(t *testing.T) {
 	Number(t, int32(11)).EqualTo(11)
 }
