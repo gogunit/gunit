@@ -20,6 +20,9 @@ func (spy *testSpy) WasCalled(t *testing.T) {
 
 func (spy *testSpy) HadError(t *testing.T) {
 	t.Helper()
+
+	spy.WasCalled(t)
+
 	if !spy.errorCalled {
 		t.Errorf("want spy.Errorf call, got ghosted")
 	}
