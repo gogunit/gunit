@@ -2,51 +2,55 @@ package gunit
 
 import "strings"
 
-func String(t T, actual string) *Str {
-	return &Str{t, actual}
+type Stringy interface {
+	~string
 }
 
-type Str struct {
+func String[S Stringy](t T, actual S) *Str[S] {
+	return &Str[S]{t, actual}
+}
+
+type Str[S Stringy] struct {
 	T
-	actual string
+	actual S
 }
 
-func (s *Str) EqualTo(expected string) {
+func (s *Str[S]) EqualTo(expected S) {
 	s.Helper()
 	if s.actual != expected {
 		s.Errorf("want <%v> equal to <%v>", s.actual, expected)
 	}
 }
 
-func (s *Str) Contains(needle string) {
+func (s *Str[S]) Contains(needle S) {
 	s.Helper()
-	if !strings.Contains(s.actual, needle) {
+	if !strings.Contains(string(s.actual), string(needle)) {
 		s.Errorf("want <%v> to contain <%v>", s.actual, needle)
 	}
 }
 
-func (s *Str) HasPrefix(prefix string) {
+func (s *Str[S]) HasPrefix(prefix S) {
 	s.Helper()
-	if !strings.HasPrefix(s.actual, prefix) {
+	if !strings.HasPrefix(string(s.actual), string(prefix)) {
 		s.Errorf("want <%v> to have prefix <%v>", s.actual, prefix)
 	}
 }
 
-func (s *Str) HasSuffix(suffix string) {
+func (s *Str[S]) HasSuffix(suffix S) {
 	s.Helper()
-	if !strings.HasSuffix(s.actual, suffix) {
+	if !strings.HasSuffix(string(s.actual), string(suffix)) {
 		s.Errorf("want <%v> to have prefix <%v>", s.actual, suffix)
 	}
 }
 
-func (s *Str) IsEmpty() {
+func (s *Str[S]) IsEmpty() {
 	s.Helper()
 	if s.actual != "" {
 		s.Errorf("want <%v> to be empty, was not", s.actual)
 	}
 }
 
-func (s *Str) IsNotEmpty() {
+func (s *Str[S]) IsNotEmpty() {
 	s.Helper()
 	if s.actual == "" {
 		s.Errorf("want <%v> to be empty, was not", s.actual)

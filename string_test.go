@@ -64,3 +64,9 @@ func Test_string_IsNotEmpty_failure(t *testing.T) {
 	String(aSpy, "").IsNotEmpty()
 	aSpy.HadError(t)
 }
+
+func Test_string_subtype_EqualTo(t *testing.T) {
+	type S string
+	var s S = "Hello world"
+	String(t, s).EqualTo("Hello world")
+}

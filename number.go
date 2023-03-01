@@ -66,3 +66,10 @@ func (n *Num[N]) Within(expected N, error float64) {
 		n.Errorf("want <%v> greater or equal to <%v>", n.actual, expected)
 	}
 }
+
+func (n *Num[N]) IsZero() {
+	n.Helper()
+	if n.actual != 0 {
+		n.Errorf("want <%v> equal to zero", n.actual)
+	}
+}

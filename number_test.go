@@ -5,35 +5,6 @@ import (
 	"testing"
 )
 
-func TestNumber_subtypes(t *testing.T) {
-	type (
-		MyInt     int
-		MyInt8    int8
-		MyInt16   int16
-		MyInt32   int32
-		MyInt64   int64
-		MyUint    uint
-		MyUint8   uint8
-		MyUint16  uint16
-		MyUint32  uint32
-		MyUint64  uint64
-		MyFloat32 float32
-		MyFloat64 float64
-	)
-	Number(t, MyInt(42)).EqualTo(42)
-	Number(t, MyInt8(42)).EqualTo(42)
-	Number(t, MyInt16(42)).EqualTo(42)
-	Number(t, MyInt32(42)).EqualTo(42)
-	Number(t, MyInt64(42)).EqualTo(42)
-	Number(t, MyUint(42)).EqualTo(42)
-	Number(t, MyUint8(42)).EqualTo(42)
-	Number(t, MyUint16(42)).EqualTo(42)
-	Number(t, MyUint32(42)).EqualTo(42)
-	Number(t, MyUint64(42)).EqualTo(42)
-	Number(t, MyFloat32(42)).EqualTo(42)
-	Number(t, MyFloat64(42)).EqualTo(42)
-}
-
 func Test_int32_EqualTo(t *testing.T) {
 	Number(t, int32(11)).EqualTo(11)
 }
@@ -117,3 +88,56 @@ func Test_float64_Within_under_fails(t *testing.T) {
 	Number(aSpy, 9.0).Within(10.0, 0.1)
 	aSpy.HadError(t)
 }
+
+func Test_int_IsZero_succeeds(t *testing.T) {
+	Number(t, 0).IsZero()
+}
+
+func Test_int_IsZero_fails(t *testing.T) {
+	aSpy := spy()
+	Number(aSpy, 1).IsZero()
+	aSpy.HadError(t)
+}
+
+func Test_Numeric_subtypes(t *testing.T) {
+	td := map[string]struct {
+		isAnswer func(t *testing.T)
+	}{
+		"int":     {isAnswer(Int(42))},
+		"int8":    {isAnswer(Int8(42))},
+		"int16":   {isAnswer(Int16(42))},
+		"int32":   {isAnswer(Int32(42))},
+		"int64":   {isAnswer(Int64(42))},
+		"uint":    {isAnswer(Uint(42))},
+		"uint8":   {isAnswer(Uint8(42))},
+		"uint16":  {isAnswer(Uint16(42))},
+		"uint32":  {isAnswer(Uint32(42))},
+		"uint64":  {isAnswer(Uint64(42))},
+		"float32": {isAnswer(Float32(42))},
+		"float64": {isAnswer(Float64(42))},
+	}
+	for n, tc := range td {
+		t.Run(n, func(t *testing.T) {
+			tc.isAnswer(t)
+		})
+	}
+}
+
+func isAnswer[N Numeric](n N) func(t *testing.T) {
+	return func(t *testing.T) { Number(t, n).EqualTo(42) }
+}
+
+type (
+	Int     int
+	Int8    int8
+	Int16   int16
+	Int32   int32
+	Int64   int64
+	Uint    uint
+	Uint8   uint8
+	Uint16  uint16
+	Uint32  uint32
+	Uint64  uint64
+	Float32 float32
+	Float64 float64
+)
