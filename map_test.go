@@ -2,6 +2,7 @@ package gunit_test
 
 import (
 	. "github.com/nfisher/gunit"
+	. "github.com/nfisher/gunit/testing"
 	"testing"
 )
 

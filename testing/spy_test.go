@@ -1,7 +1,9 @@
-package gunit_test
+package testing_test
 
-import "testing"
-import . "github.com/nfisher/gunit"
+import (
+	. "github.com/nfisher/gunit/testing"
+	"testing"
+)
 
 func Test_Spy_Helper_called(t *testing.T) {
 	aSpy := Spy()

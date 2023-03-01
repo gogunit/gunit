@@ -1,4 +1,4 @@
-package gunit
+package testing
 
 import "testing"
 
