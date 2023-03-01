@@ -10,7 +10,7 @@ func Test_struct_EqualTo_success(t *testing.T) {
 }
 
 func Test_struct_EqualTo_failure(t *testing.T) {
-	aSpy := spy()
+	aSpy := Spy()
 	Struct(aSpy, &s{A: "Hello"}).EqualTo(&s{A: "Good-bye"})
 	aSpy.HadError(t)
 }
