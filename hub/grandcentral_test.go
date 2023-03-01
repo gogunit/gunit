@@ -1,7 +1,7 @@
-package gunit_test
+package hub_test
 
 import (
-	. "github.com/nfisher/gunit"
+	. "github.com/nfisher/gunit/hub"
 	. "github.com/nfisher/gunit/testing"
 	"testing"
 )
