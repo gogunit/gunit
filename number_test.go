@@ -99,7 +99,7 @@ func Test_int_IsZero_fails(t *testing.T) {
 	aSpy.HadError(t)
 }
 
-func Test_Numeric_subtypes(t *testing.T) {
+func Test_numeric_subtypes(t *testing.T) {
 	td := map[string]struct {
 		isAnswer func(t *testing.T)
 	}{
