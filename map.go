@@ -11,7 +11,7 @@ func Map[K comparable, V any](t T, actual map[K]V) *Mappy[K, V] {
 	return &Mappy[K, V]{t, actual}
 }
 
-func (m *Mappy[K, V]) HasKeys(keys ...K) {
+func (m *Mappy[K, V]) WithKeys(keys ...K) {
 	m.Helper()
 	missing := []K{}
 	has := make(map[K]bool, len(m.actual))
@@ -32,7 +32,7 @@ func (m *Mappy[K, V]) HasKeys(keys ...K) {
 	}
 }
 
-func (m *Mappy[K, V]) HasValues(values ...V) {
+func (m *Mappy[K, V]) WithValues(values ...V) {
 	m.Helper()
 	missing := []V{}
 	present := make(map[int]bool)
@@ -65,6 +65,27 @@ func (m *Mappy[K, V]) EqualTo(expected map[K]V) {
 	m.Helper()
 	if diff := cmp.Diff(expected, m.actual); diff != "" {
 		m.Errorf("map mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func (m *Mappy[K, V]) WithoutKeys(keys ...K) {
+	m.Helper()
+	present := []K{}
+	has := make(map[K]bool, len(m.actual))
+	added := make(map[K]bool)
+	for k := range m.actual {
+		has[k] = true
+	}
+	for _, k := range keys {
+		if has[k] {
+			if !added[k] {
+				present = append(present, k)
+			}
+			added[k] = true
+		}
+	}
+	if len(present) > 0 {
+		m.Errorf("want map without keys <%v>, but present", present)
 	}
 }
 
