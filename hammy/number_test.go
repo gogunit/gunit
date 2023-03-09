@@ -1,152 +1,87 @@
-package hammy
+package hammy_test
 
 import (
-	"fmt"
-	"github.com/nfisher/gunit"
+	. "github.com/nfisher/gunit/hammy"
 	. "github.com/nfisher/gunit/testing"
-	"math"
 	"testing"
 )
 
-func Test_int_equalTo_success(t *testing.T) {
+func Test_int_EqualTo_success(t *testing.T) {
 	assert := New(t)
 	assert.That(Number(123).EqualTo(123))
 }
 
-func Test_int_is_equalTo_success(t *testing.T) {
-	assert := New(t)
-	assert.That(Number(123).Is(EqualTo(123)))
-}
-
-func Test_int_equalTo_failure(t *testing.T) {
+func Test_int8_EqualTo_failure(t *testing.T) {
 	aSpy := Spy()
-	assert := New(aSpy)
-	assert.That(Number(123).EqualTo(345))
+	New(aSpy).That(Number(int8(123)).EqualTo(124))
 	aSpy.HadError(t)
 }
 
-func Test_int_is_equalTo_failure(t *testing.T) {
+func Test_int16_NotEqual_success(t *testing.T) {
+	New(t).That(Number(uint16(42)).NotEqual(41))
+}
+
+func Test_int32_NotEqual_failure(t *testing.T) {
 	aSpy := Spy()
-	assert := New(aSpy)
-	assert.That(Number(123).Is(EqualTo(345)))
+	New(aSpy).That(Number(uint(42)).NotEqual(42))
 	aSpy.HadError(t)
 }
 
-func Test_int_is_not_equalTo_failure(t *testing.T) {
+func Test_int64_LessThan_success(t *testing.T) {
+	New(t).That(Number(int64(10)).LessThan(11))
+}
+
+func Test_uint_LessThan_failure(t *testing.T) {
 	aSpy := Spy()
-	assert := New(aSpy)
-	assert.That(Number(123).Is(Not(EqualTo(123))))
+	New(aSpy).That(Number(uint(11)).LessThan(10))
 	aSpy.HadError(t)
 }
 
-func Test_int_is_within_failure(t *testing.T) {
+func Test_uint8_GreaterThan_success(t *testing.T) {
+	New(t).That(Number(uint8(8)).GreaterThan(7))
+}
+
+func Test_uint16_GreaterThan_failure(t *testing.T) {
 	aSpy := Spy()
-	assert := New(aSpy)
-	assert.That(Number(123).Is(Within(345, 1.0)))
+	New(aSpy).That(Number(uint16(9)).GreaterThan(10))
 	aSpy.HadError(t)
 }
 
-type Numeric interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 |
-		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 |
-		~float32 | ~float64
+func Test_uint32_LessOrEqual_success(t *testing.T) {
+	New(t).That(Number(uint32(10)).LessOrEqual(10))
 }
 
-type Stringy interface {
-	~string
+func Test_uint64_LessOrEqual_failure(t *testing.T) {
+	aSpy := Spy()
+	New(aSpy).That(Number(uint64(11)).LessOrEqual(10))
+	aSpy.HadError(t)
 }
 
-type Primitives interface {
-	Stringy | Numeric
+func Test_float32_GreaterOrEqual_success(t *testing.T) {
+	New(t).That(Number(uint32(10)).GreaterOrEqual(10))
 }
 
-func New(t gunit.T) *Hammy {
-	return &Hammy{t}
+func Test_float64_GreaterOrEqual_failure(t *testing.T) {
+	aSpy := Spy()
+	New(aSpy).That(Number(float64(10)).GreaterOrEqual(11))
+	aSpy.HadError(t)
 }
 
-type Hammy struct {
-	t gunit.T
+func Test_int_IsZero_success(t *testing.T) {
+	New(t).That(Number(0).IsZero())
 }
 
-type Asserter func(gunit.T)
-
-func (h *Hammy) That(a Asserter) {
-	a(h.t)
+func Test_int_IsZero_failure(t *testing.T) {
+	aSpy := Spy()
+	New(aSpy).That(Number(1).IsZero())
+	aSpy.HadError(t)
 }
 
-func Number[N Numeric](actual N) *Num[N] {
-	return &Num[N]{actual: actual}
+func Test_float64_Within_success(t *testing.T) {
+	New(t).That(Number(float64(123)).Within(123.1, 0.2))
 }
 
-type Num[N Numeric] struct {
-	actual N
-}
-
-func (n *Num[N]) EqualTo(expected N) func(gunit.T) {
-	return func(t gunit.T) {
-		t.Helper()
-		if n.actual != expected {
-			t.Errorf("want <%v> equal to <%v>", n.actual, expected)
-		}
-	}
-}
-
-func (n *Num[N]) Is(fn func(actual N, t gunit.T) AssertionMessage) Asserter {
-	return func(t gunit.T) {
-		t.Helper()
-		msg := fn(n.actual, t)
-		if !msg.Result {
-			t.Errorf(msg.Message)
-		}
-	}
-}
-
-func Not[N Primitives](fn func(actual N, t gunit.T) AssertionMessage) func(actual N, t gunit.T) AssertionMessage {
-	return func(actual N, t gunit.T) AssertionMessage {
-		msg := fn(actual, t)
-		msg.Result = !msg.Result
-		return msg
-	}
-}
-
-func EqualTo[N Primitives](expected N) func(actual N, t gunit.T) AssertionMessage {
-	return func(actual N, t gunit.T) AssertionMessage {
-		return AssertionMessage{
-			Message: fmt.Sprintf("want <%v> equal to <%v>", actual, expected),
-			Result:  actual == expected,
-		}
-	}
-}
-
-func LessThan[N Primitives](expected N) func(actual N, t gunit.T) AssertionMessage {
-	return func(actual N, t gunit.T) AssertionMessage {
-		return AssertionMessage{
-			Message: fmt.Sprintf("want <%v> equal to <%v>", actual, expected),
-			Result:  actual < expected,
-		}
-	}
-}
-
-func GreaterThan[N Primitives](expected N) func(actual N, t gunit.T) AssertionMessage {
-	return func(actual N, t gunit.T) AssertionMessage {
-		return AssertionMessage{
-			Message: fmt.Sprintf("want <%v> equal to <%v>", actual, expected),
-			Result:  actual > expected,
-		}
-	}
-}
-
-func Within[N Numeric](expected N, delta float64) func(actual N, t gunit.T) AssertionMessage {
-	return func(actual N, t gunit.T) AssertionMessage {
-		diff := math.Abs(float64(actual) - float64(expected))
-		return AssertionMessage{
-			Message: fmt.Sprintf("want <%v> equal to <%v>", actual, expected),
-			Result:  diff < delta,
-		}
-	}
-}
-
-type AssertionMessage struct {
-	Message string
-	Result  bool
+func Test_float32_Within_failure(t *testing.T) {
+	aSpy := Spy()
+	New(aSpy).That(Number(123).Within(140, 0.2))
 }
