@@ -9,3 +9,8 @@ type Numeric interface {
 type Stringy interface {
 	~string
 }
+
+type AssertionMessage struct {
+	Message      string
+	IsSuccessful bool
+}

@@ -2,24 +2,8 @@ package hammy
 
 import (
 	"fmt"
-	"github.com/nfisher/gunit"
 	"math"
 )
-
-func New(t gunit.T) *Hammy {
-	return &Hammy{t}
-}
-
-type Hammy struct {
-	gunit.T
-}
-
-func (h *Hammy) That(a AssertionMessage) {
-	h.Helper()
-	if !a.IsSuccessful {
-		h.Errorf(a.Message)
-	}
-}
 
 func Number[N Numeric](actual N) *Num[N] {
 	return &Num[N]{actual: actual}
@@ -84,9 +68,4 @@ func (n *Num[N]) Within(expected N, error float64) AssertionMessage {
 		IsSuccessful: diff <= error,
 		Message:      fmt.Sprintf("want <%v> greater or equal to <%v>", n.actual, expected),
 	}
-}
-
-type AssertionMessage struct {
-	Message      string
-	IsSuccessful bool
 }

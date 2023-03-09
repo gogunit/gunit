@@ -2,7 +2,7 @@ package gunit_test
 
 import (
 	. "github.com/nfisher/gunit"
-	. "github.com/nfisher/gunit/testing"
+	"github.com/nfisher/gunit/eye"
 	"testing"
 )
 
@@ -11,7 +11,7 @@ func Test_int32_EqualTo(t *testing.T) {
 }
 
 func Test_uint_EqualTo_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, uint(123)).EqualTo(234)
 	aSpy.HadError(t)
 }
@@ -21,7 +21,7 @@ func Test_int64_NotEqual(t *testing.T) {
 }
 
 func Test_uint8_NotEqual_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, uint8(10)).NotEqualTo(10)
 	aSpy.HadError(t)
 }
@@ -31,7 +31,7 @@ func Test_int16_LessThan(t *testing.T) {
 }
 
 func Test_uint16_LessThan_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, uint16(11)).LessThan(10)
 	aSpy.HadError(t)
 }
@@ -41,7 +41,7 @@ func Test_int_GreaterThan_succeeds(t *testing.T) {
 }
 
 func Test_uint32_GreaterThan_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, uint32(9)).GreaterThan(10)
 	aSpy.HadError(t)
 }
@@ -55,7 +55,7 @@ func Test_float32_LessOrEqual_less_succeeds(t *testing.T) {
 }
 
 func Test_uint64_LessOrEqual_greater_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, uint64(11)).LessOrEqual(10)
 	aSpy.HadError(t)
 }
@@ -69,7 +69,7 @@ func Test_float32_GreaterOrEqual_greater_succeeds(t *testing.T) {
 }
 
 func Test_int_GreaterOrEqual_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, 9).GreaterOrEqual(10)
 	aSpy.HadError(t)
 }
@@ -79,13 +79,13 @@ func Test_float64_Within_succeeds(t *testing.T) {
 }
 
 func Test_float64_Within_over_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, 11.0).Within(10.0, 0.1)
 	aSpy.HadError(t)
 }
 
 func Test_float64_Within_under_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, 9.0).Within(10.0, 0.1)
 	aSpy.HadError(t)
 }
@@ -95,7 +95,7 @@ func Test_int_IsZero_succeeds(t *testing.T) {
 }
 
 func Test_int_IsZero_fails(t *testing.T) {
-	aSpy := Spy()
+	aSpy := eye.Spy()
 	Number(aSpy, 1).IsZero()
 	aSpy.HadError(t)
 }

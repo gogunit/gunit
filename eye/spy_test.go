@@ -1,7 +1,7 @@
-package testing_test
+package eye_test
 
 import (
-	. "github.com/nfisher/gunit/testing"
+	. "github.com/nfisher/gunit/eye"
 	"testing"
 )
 

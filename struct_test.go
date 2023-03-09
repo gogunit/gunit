@@ -2,7 +2,7 @@ package gunit_test
 
 import (
 	. "github.com/nfisher/gunit"
-	. "github.com/nfisher/gunit/testing"
+	. "github.com/nfisher/gunit/eye"
 	"testing"
 )
 
