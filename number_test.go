@@ -37,7 +37,7 @@ func Test_uint16_LessThan_fails(t *testing.T) {
 }
 
 func Test_int_GreaterThan_succeeds(t *testing.T) {
-	Number(t, int(11)).GreaterThan(10)
+	Number(t, 11).GreaterThan(10)
 }
 
 func Test_uint32_GreaterThan_fails(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_float32_GreaterOrEqual_greater_succeeds(t *testing.T) {
 
 func Test_int_GreaterOrEqual_fails(t *testing.T) {
 	aSpy := Spy()
-	Number(aSpy, int(9)).GreaterOrEqual(10)
+	Number(aSpy, 9).GreaterOrEqual(10)
 	aSpy.HadError(t)
 }
 

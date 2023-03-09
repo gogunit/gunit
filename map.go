@@ -89,4 +89,4 @@ func (m *Mappy[K, V]) WithoutKeys(keys ...K) {
 	}
 }
 
-// TODO: Implement Includes() or Contains() for subset?
+// TODO: Implement Includes() or Contains() for subset of pairs?
