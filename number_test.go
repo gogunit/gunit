@@ -1,102 +1,103 @@
 package gunit_test
 
 import (
-	. "github.com/nfisher/gunit"
-	"github.com/nfisher/gunit/eye"
+	"github.com/gogunit/gunit"
+	"github.com/gogunit/gunit/eye"
+	ham "github.com/gogunit/gunit/hammy"
 	"testing"
 )
 
 func Test_int32_EqualTo(t *testing.T) {
-	Number(t, int32(11)).EqualTo(11)
+	gunit.Number(t, int32(11)).EqualTo(11)
 }
 
 func Test_uint_EqualTo_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, uint(123)).EqualTo(234)
+	gunit.Number(aSpy, uint(123)).EqualTo(234)
 	aSpy.HadError(t)
 }
 
 func Test_int64_NotEqual(t *testing.T) {
-	Number(t, int64(123)).NotEqualTo(234)
+	gunit.Number(t, int64(123)).NotEqualTo(234)
 }
 
 func Test_uint8_NotEqual_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, uint8(10)).NotEqualTo(10)
+	gunit.Number(aSpy, uint8(10)).NotEqualTo(10)
 	aSpy.HadError(t)
 }
 
 func Test_int16_LessThan(t *testing.T) {
-	Number(t, int16(10)).LessThan(11)
+	gunit.Number(t, int16(10)).LessThan(11)
 }
 
 func Test_uint16_LessThan_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, uint16(11)).LessThan(10)
+	gunit.Number(aSpy, uint16(11)).LessThan(10)
 	aSpy.HadError(t)
 }
 
 func Test_int_GreaterThan_succeeds(t *testing.T) {
-	Number(t, 11).GreaterThan(10)
+	gunit.Number(t, 11).GreaterThan(10)
 }
 
 func Test_uint32_GreaterThan_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, uint32(9)).GreaterThan(10)
+	gunit.Number(aSpy, uint32(9)).GreaterThan(10)
 	aSpy.HadError(t)
 }
 
 func Test_float64_LessOrEqual_equal_succeeds(t *testing.T) {
-	Number(t, float64(10.0)).LessOrEqual(10.0)
+	gunit.Number(t, float64(10.0)).LessOrEqual(10.0)
 }
 
 func Test_float32_LessOrEqual_less_succeeds(t *testing.T) {
-	Number(t, float32(9.0)).LessOrEqual(10.0)
+	gunit.Number(t, float32(9.0)).LessOrEqual(10.0)
 }
 
 func Test_uint64_LessOrEqual_greater_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, uint64(11)).LessOrEqual(10)
+	gunit.Number(aSpy, uint64(11)).LessOrEqual(10)
 	aSpy.HadError(t)
 }
 
 func Test_float64_GreaterOrEqual_equal_succeeds(t *testing.T) {
-	Number(t, float64(11.0)).GreaterOrEqual(11.0)
+	gunit.Number(t, float64(11.0)).GreaterOrEqual(11.0)
 }
 
 func Test_float32_GreaterOrEqual_greater_succeeds(t *testing.T) {
-	Number(t, float32(11.0)).GreaterOrEqual(10.0)
+	gunit.Number(t, float32(11.0)).GreaterOrEqual(10.0)
 }
 
 func Test_int_GreaterOrEqual_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, 9).GreaterOrEqual(10)
+	gunit.Number(aSpy, 9).GreaterOrEqual(10)
 	aSpy.HadError(t)
 }
 
 func Test_float64_Within_succeeds(t *testing.T) {
-	Number(t, float64(11.0)).Within(11.1, 0.1)
+	gunit.Number(t, float64(11.0)).Within(11.1, 0.1)
 }
 
 func Test_float64_Within_over_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, 11.0).Within(10.0, 0.1)
+	gunit.Number(aSpy, 11.0).Within(10.0, 0.1)
 	aSpy.HadError(t)
 }
 
 func Test_float64_Within_under_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, 9.0).Within(10.0, 0.1)
+	gunit.Number(aSpy, 9.0).Within(10.0, 0.1)
 	aSpy.HadError(t)
 }
 
 func Test_int_IsZero_succeeds(t *testing.T) {
-	Number(t, 0).IsZero()
+	gunit.Number(t, 0).IsZero()
 }
 
 func Test_int_IsZero_fails(t *testing.T) {
 	aSpy := eye.Spy()
-	Number(aSpy, 1).IsZero()
+	gunit.Number(aSpy, 1).IsZero()
 	aSpy.HadError(t)
 }
 
@@ -124,8 +125,8 @@ func Test_numeric_subtypes(t *testing.T) {
 	}
 }
 
-func isAnswer[N Numeric](n N) func(t *testing.T) {
-	return func(t *testing.T) { Number(t, n).EqualTo(42) }
+func isAnswer[N ham.Numeric](n N) func(t *testing.T) {
+	return func(t *testing.T) { gunit.Number(t, n).EqualTo(42) }
 }
 
 type (

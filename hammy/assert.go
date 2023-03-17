@@ -1,6 +1,6 @@
 package hammy
 
-import "github.com/nfisher/gunit"
+import "github.com/gogunit/gunit"
 
 func New(t gunit.T) *Hammy {
 	return &Hammy{t}

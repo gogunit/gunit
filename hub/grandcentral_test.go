@@ -1,8 +1,8 @@
 package hub_test
 
 import (
-	"github.com/nfisher/gunit/eye"
-	"github.com/nfisher/gunit/hub"
+	"github.com/gogunit/gunit/eye"
+	"github.com/gogunit/gunit/hub"
 	"testing"
 )
 

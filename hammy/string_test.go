@@ -1,8 +1,8 @@
 package hammy_test
 
 import (
-	"github.com/nfisher/gunit/eye"
-	"github.com/nfisher/gunit/hammy"
+	"github.com/gogunit/gunit/eye"
+	"github.com/gogunit/gunit/hammy"
 	"testing"
 )
 

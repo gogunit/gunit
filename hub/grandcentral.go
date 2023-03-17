@@ -1,6 +1,6 @@
 package hub
 
-import "github.com/nfisher/gunit"
+import "github.com/gogunit/gunit"
 
 func New(t gunit.T) *GrandCentral {
 	return &GrandCentral{t: t}
