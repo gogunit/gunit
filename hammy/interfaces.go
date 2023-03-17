@@ -11,6 +11,6 @@ type Stringy interface {
 }
 
 type AssertionMessage struct {
-	Message      string
 	IsSuccessful bool
+	Message      string
 }
