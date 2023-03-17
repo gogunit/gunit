@@ -72,3 +72,8 @@ func (m Mappy[K, V]) WithoutKeys(keys ...K) AssertionMessage {
 	}
 	return Assert(len(present) == 0, "want map without keys <%v>, but present", present)
 }
+
+func (m Mappy[K, V]) Len(expected int) AssertionMessage {
+	sz := len(m.actual)
+	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
+}
