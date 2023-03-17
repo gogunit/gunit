@@ -20,16 +20,8 @@ func (n *Num[N]) NotEqual(expected N) AssertionMessage {
 	return Assert(n.actual != expected, "want <%v> not equal to <%v>", n.actual, expected)
 }
 
-func (n *Num[N]) LessThan(expected N) AssertionMessage {
-	return Assert(n.actual < expected, "want <%v> less than <%v>", n.actual, expected)
-}
-
 func (n *Num[N]) GreaterThan(expected N) AssertionMessage {
 	return Assert(n.actual > expected, "want <%v> greater than <%v>", n.actual, expected)
-}
-
-func (n *Num[N]) LessOrEqual(expected N) AssertionMessage {
-	return Assert(n.actual <= expected, "want <%v> less or equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) GreaterOrEqual(expected N) AssertionMessage {
@@ -38,6 +30,14 @@ func (n *Num[N]) GreaterOrEqual(expected N) AssertionMessage {
 
 func (n *Num[N]) IsZero() AssertionMessage {
 	return Assert(n.actual == 0, "want <%v> equal to zero", n.actual)
+}
+
+func (n *Num[N]) LessThan(expected N) AssertionMessage {
+	return Assert(n.actual < expected, "want <%v> less than <%v>", n.actual, expected)
+}
+
+func (n *Num[N]) LessOrEqual(expected N) AssertionMessage {
+	return Assert(n.actual <= expected, "want <%v> less or equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) Within(expected N, error float64) AssertionMessage {

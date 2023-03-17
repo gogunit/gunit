@@ -12,11 +12,6 @@ type Slc[I any] struct {
 	actual []I
 }
 
-func (a Slc[I]) Len(expected int) AssertionMessage {
-	sz := len(a.actual)
-	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
-}
-
 func (a Slc[I]) Contains(expected ...I) AssertionMessage {
 	hasMatch := make([]bool, len(expected))
 	for _, item := range a.actual {
@@ -36,4 +31,9 @@ func (a Slc[I]) Contains(expected ...I) AssertionMessage {
 		}
 	}
 	return Assert(isSuccessful, "want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched)
+}
+
+func (a Slc[I]) Len(expected int) AssertionMessage {
+	sz := len(a.actual)
+	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
 }
