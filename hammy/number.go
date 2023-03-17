@@ -1,7 +1,6 @@
 package hammy
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -14,58 +13,34 @@ type Num[N Numeric] struct {
 }
 
 func (n *Num[N]) EqualTo(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual == expected,
-		Message:      fmt.Sprintf("want <%v> equal to <%v>", n.actual, expected),
-	}
+	return Assert(n.actual == expected, "want <%v> equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) NotEqual(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual != expected,
-		Message:      fmt.Sprintf("want <%v> not equal to <%v>", n.actual, expected),
-	}
+	return Assert(n.actual != expected, "want <%v> not equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) LessThan(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual < expected,
-		Message:      fmt.Sprintf("want <%v> less than <%v>", n.actual, expected),
-	}
+	return Assert(n.actual < expected, "want <%v> less than <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) GreaterThan(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual > expected,
-		Message:      fmt.Sprintf("want <%v> greater than <%v>", n.actual, expected),
-	}
+	return Assert(n.actual > expected, "want <%v> greater than <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) LessOrEqual(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual <= expected,
-		Message:      fmt.Sprintf("want <%v> less or equal to <%v>", n.actual, expected),
-	}
+	return Assert(n.actual <= expected, "want <%v> less or equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) GreaterOrEqual(expected N) AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual >= expected,
-		Message:      fmt.Sprintf("want <%v> greater or equal to <%v>", n.actual, expected),
-	}
+	return Assert(n.actual >= expected, "want <%v> greater or equal to <%v>", n.actual, expected)
 }
 
 func (n *Num[N]) IsZero() AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: n.actual == 0,
-		Message:      fmt.Sprintf("want <%v> equal to zero", n.actual),
-	}
+	return Assert(n.actual == 0, "want <%v> equal to zero", n.actual)
 }
 
 func (n *Num[N]) Within(expected N, error float64) AssertionMessage {
 	diff := math.Abs(float64(n.actual - expected))
-	return AssertionMessage{
-		IsSuccessful: diff <= error,
-		Message:      fmt.Sprintf("want <%v> greater or equal to <%v>", n.actual, expected),
-	}
+	return Assert(diff <= error, "want <%v> greater or equal to <%v>", n.actual, expected)
 }

@@ -1,7 +1,6 @@
 package hammy
 
 import (
-	"fmt"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,10 +14,7 @@ type Slc[I any] struct {
 
 func (a Slc[I]) Len(expected int) AssertionMessage {
 	sz := len(a.actual)
-	return AssertionMessage{
-		IsSuccessful: sz == expected,
-		Message:      fmt.Sprintf("want len of <%v>, got <%v>", sz, expected),
-	}
+	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
 }
 
 func (a Slc[I]) Contains(expected ...I) AssertionMessage {
@@ -39,8 +35,5 @@ func (a Slc[I]) Contains(expected ...I) AssertionMessage {
 			unmatched = append(unmatched, i)
 		}
 	}
-	return AssertionMessage{
-		IsSuccessful: isSuccessful,
-		Message:      fmt.Sprintf("want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched),
-	}
+	return Assert(isSuccessful, "want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched)
 }

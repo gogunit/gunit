@@ -1,7 +1,6 @@
 package hammy
 
 import (
-	"fmt"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -30,17 +29,11 @@ func (m Mappy[K, V]) WithKeys(keys ...K) AssertionMessage {
 			hasNot[k] = true
 		}
 	}
-	return AssertionMessage{
-		IsSuccessful: len(missing) == 0,
-		Message:      fmt.Sprintf("want map with keys <%v>, but missing", missing),
-	}
+	return Assert(len(missing) == 0, "want map with keys <%v>, but missing", missing)
 }
 
 func (m Mappy[K, V]) IsEmpty() AssertionMessage {
-	return AssertionMessage{
-		IsSuccessful: len(m.actual) == 0,
-		Message:      fmt.Sprintf("want empty map, got len() = %v", len(m.actual)),
-	}
+	return Assert(len(m.actual) == 0, "want empty map, got len() = %v", len(m.actual))
 }
 
 func (m Mappy[K, V]) WithValues(values ...V) AssertionMessage {
@@ -59,11 +52,7 @@ func (m Mappy[K, V]) WithValues(values ...V) AssertionMessage {
 			missing = append(missing, v)
 		}
 	}
-	return AssertionMessage{
-		IsSuccessful: len(missing) == 0,
-		Message:      fmt.Sprintf("want map with values <%v>, but missing", missing),
-	}
-
+	return Assert(len(missing) == 0, "want map with values <%v>, but missing", missing)
 }
 
 func (m Mappy[K, V]) WithoutKeys(keys ...K) AssertionMessage {
@@ -81,8 +70,5 @@ func (m Mappy[K, V]) WithoutKeys(keys ...K) AssertionMessage {
 			added[k] = true
 		}
 	}
-	return AssertionMessage{
-		IsSuccessful: len(present) == 0,
-		Message:      fmt.Sprintf("want map without keys <%v>, but present", present),
-	}
+	return Assert(len(present) == 0, "want map without keys <%v>, but present", present)
 }
