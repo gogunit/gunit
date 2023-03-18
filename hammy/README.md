@@ -21,37 +21,42 @@ func Test_calculator(t *testing.T) {
 
 ## Map
 
-* [ ] EqualTo
-* [ ] IsEmpty
-* [ ] WithKeys
-* [ ] WithoutKeys
-* [ ] WithValues
+* [x] EqualTo
+* [x] IsEmpty
+* [x] Len
+* [x] WithItem
+* [x] WithKeys
+* [x] WithoutKeys
+* [x] WithValues
 
 ## Number
 
-* [ ] EqualTo
-* [ ] GreaterThan
-* [ ] GreaterThanOrEqualTo
-* [ ] IsZero
-* [ ] Len
-* [ ] LessThan
-* [ ] LessThanOrEqualTo
-* [ ] WithIn
+* [x] EqualTo
+* [x] GreaterThan
+* [x] GreaterOrEqual
+* [x] IsZero
+* [x] LessThan
+* [x] LessOrEqual
+* [x] Within
 
 ## Slice
 
-* [ ] Contains
-* [ ] EqualTo
-* [ ] Len
+* [x] Contains
+* [x] EqualTo
+* [x] Len
 
 ## String
 
+* [x] EqualTo
+* [x] ToLowerEqualTo
+* [x] Contains
+* [x] HasPrefix
+* [x] HasSuffix
+* [x] IsEmpty
+
+## Struct
+
 * [ ] EqualTo
-* [ ] LowerCaseEqualTo
-* [ ] Contains
-* [ ] HasPrefix
-* [ ] HasSuffix
-* [ ] IsEmpty
 
 ## Writing a Custom Matcher
 

@@ -77,3 +77,16 @@ func (m Mappy[K, V]) Len(expected int) AssertionMessage {
 	sz := len(m.actual)
 	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
 }
+
+func (m Mappy[K, V]) WithItem(k K, expected V) AssertionMessage {
+	actual, ok := m.actual[k]
+	if !ok {
+		return Assert(false, "want key=<%v>, but was absent", k)
+	}
+	return Assert(cmp.Equal(actual, expected), "want value=<%v> for key=<hi>, got <%v>", expected, actual)
+}
+
+func (m Mappy[K, V]) EqualTo(expected map[K]V) AssertionMessage {
+	diff := cmp.Diff(expected, m.actual)
+	return Assert(diff == "", "Map mismatch (-want +got):\n%s", diff)
+}

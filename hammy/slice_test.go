@@ -1,9 +1,10 @@
 package hammy_test
 
 import (
+	"testing"
+
 	"github.com/gogunit/gunit/eye"
 	"github.com/gogunit/gunit/hammy"
-	"testing"
 )
 
 func Test_Slice_Len_failure(t *testing.T) {
@@ -28,4 +29,16 @@ func Test_Slice_Contains_failure(t *testing.T) {
 func Test_Slice_Contains_success(t *testing.T) {
 	assert := hammy.New(t)
 	assert.Is(hammy.Slice([]int{1, 2, 3}).Contains(2, 3))
+}
+
+func Test_Slice_EqualTo_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Slice([]int{1, 2, 3}).EqualTo(2, 3, 4))
+	aSpy.HadError(t)
+}
+
+func Test_Slice_EqualTo_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Slice([]int{1, 2, 3}).EqualTo(1, 2, 3))
 }

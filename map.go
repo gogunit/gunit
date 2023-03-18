@@ -27,7 +27,7 @@ func (m *Mappy[K, V]) IsEmpty() {
 
 func (m *Mappy[K, V]) WithKeys(keys ...K) {
 	m.Helper()
-	missing := []K{}
+	var missing []K
 	has := make(map[K]bool, len(m.actual))
 	hasNot := make(map[K]bool)
 	for k := range m.actual {
@@ -46,9 +46,30 @@ func (m *Mappy[K, V]) WithKeys(keys ...K) {
 	}
 }
 
+func (m *Mappy[K, V]) WithoutKeys(keys ...K) {
+	m.Helper()
+	var present []K
+	has := make(map[K]bool, len(m.actual))
+	added := make(map[K]bool)
+	for k := range m.actual {
+		has[k] = true
+	}
+	for _, k := range keys {
+		if has[k] {
+			if !added[k] {
+				present = append(present, k)
+			}
+			added[k] = true
+		}
+	}
+	if len(present) > 0 {
+		m.Errorf("want map without keys <%v>, but present", present)
+	}
+}
+
 func (m *Mappy[K, V]) WithValues(values ...V) {
 	m.Helper()
-	missing := []V{}
+	var missing []V
 	present := make(map[int]bool)
 	for _, actual := range m.actual {
 		for i, expected := range values {
@@ -65,27 +86,6 @@ func (m *Mappy[K, V]) WithValues(values ...V) {
 	}
 	if len(missing) > 0 {
 		m.Errorf("want map with values <%v>, but missing", missing)
-	}
-}
-
-func (m *Mappy[K, V]) WithoutKeys(keys ...K) {
-	m.Helper()
-	present := []K{}
-	has := make(map[K]bool, len(m.actual))
-	added := make(map[K]bool)
-	for k := range m.actual {
-		has[k] = true
-	}
-	for _, k := range keys {
-		if has[k] {
-			if !added[k] {
-				present = append(present, k)
-			}
-			added[k] = true
-		}
-	}
-	if len(present) > 0 {
-		m.Errorf("want map without keys <%v>, but present", present)
 	}
 }
 

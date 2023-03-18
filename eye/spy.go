@@ -39,7 +39,7 @@ func (spy *TestSpy) HadErrorContaining(t *testing.T, substr string) {
 	spy.WasCalled(t)
 
 	if !strings.Contains(spy.ErrorMessage, substr) {
-		t.Errorf("want spy.Errorf call containing %v, not found", substr)
+		t.Errorf("want spy.Errorf call containing:\n%v\n got:\n%v", substr, spy.ErrorMessage)
 	}
 }
 

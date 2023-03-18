@@ -12,7 +12,7 @@ type Slc[I any] struct {
 	actual []I
 }
 
-func (a Slc[I]) Contains(expected ...I) AssertionMessage {
+func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 	hasMatch := make([]bool, len(expected))
 	for _, item := range a.actual {
 		for i, e := range expected {
@@ -33,7 +33,12 @@ func (a Slc[I]) Contains(expected ...I) AssertionMessage {
 	return Assert(isSuccessful, "want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched)
 }
 
-func (a Slc[I]) Len(expected int) AssertionMessage {
+func (a *Slc[I]) EqualTo(expected ...int) AssertionMessage {
+	diff := cmp.Diff(expected, a.actual)
+	return Assert(diff == "", "slice mismatch (-want +got):\\n%s", diff)
+}
+
+func (a *Slc[I]) Len(expected int) AssertionMessage {
 	sz := len(a.actual)
 	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
 }
