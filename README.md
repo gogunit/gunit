@@ -4,6 +4,7 @@
 [![CodeQL](https://github.com/gogunit/gunit/actions/workflows/codeql.yml/badge.svg)](https://github.com/gogunit/gunit/actions/workflows/codeql.yml)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gogunit/gunit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gogunit/gunit)](https://goreportcard.com/report/github.com/gogunit/gunit)
+[![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/gogunit/gunit/)
 
 Go unit test assertions library.
 

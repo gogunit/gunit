@@ -1,5 +1,7 @@
 # Hammy
 
+[![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/gogunit/gunit/hammy)
+
 Hammy is a HamCrest inspired assertion library.
 The aim is to provide terse compile-time oriented type checking.
 
