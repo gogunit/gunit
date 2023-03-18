@@ -58,7 +58,7 @@ func Test_calculator(t *testing.T) {
 
 ## Struct
 
-* [ ] EqualTo
+* [x] EqualTo
 
 ## Writing a Custom Matcher
 
