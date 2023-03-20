@@ -18,7 +18,7 @@ type Str[S Stringy] struct {
 func (s *Str[S]) EqualTo(expected S) {
 	s.Helper()
 	if s.actual != expected {
-		s.Errorf("want <%v> equal to <%v>", s.actual, expected)
+		s.Errorf("wanted <%v> equal to <%v>", s.actual, expected)
 	}
 }
 

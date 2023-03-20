@@ -12,5 +12,5 @@ type St[S any] struct {
 
 func (s *St[S]) EqualTo(expected S) AssertionMessage {
 	diff := cmp.Diff(expected, s.actual)
-	return Assert(diff == "", "Struct mismatch (-want +got):\n%s", diff)
+	return Assert(diff == "", "Structs are not equal (+got -want):\n%s", diff)
 }

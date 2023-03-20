@@ -19,7 +19,7 @@ type TestSpy struct {
 func (spy *TestSpy) WasCalled(t *testing.T) {
 	t.Helper()
 	if !spy.HelperCalled {
-		t.Errorf("want Spy.Helper call, got ghosted")
+		t.Errorf("got ghosted, wanted call to Spy.Helper")
 	}
 }
 
@@ -27,9 +27,8 @@ func (spy *TestSpy) HadError(t *testing.T) {
 	t.Helper()
 
 	spy.WasCalled(t)
-
 	if !spy.ErrorCalled {
-		t.Errorf("want Spy.Errorf call, got ghosted")
+		t.Errorf("got ghosted, wanted call to Spy.Errorf")
 	}
 }
 
@@ -37,9 +36,8 @@ func (spy *TestSpy) HadErrorContaining(t *testing.T, substr string) {
 	t.Helper()
 
 	spy.WasCalled(t)
-
 	if !strings.Contains(spy.ErrorMessage, substr) {
-		t.Errorf("want spy.Errorf call containing:\n%v\n got:\n%v", substr, spy.ErrorMessage)
+		t.Errorf("got:\n%s\nwanted call to spy.Errorf containing:\n%s\n", spy.ErrorMessage, substr)
 	}
 }
 

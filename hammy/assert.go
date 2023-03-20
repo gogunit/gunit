@@ -23,3 +23,11 @@ func (h *Hammy) That(msg string, a AssertionMessage) {
 		h.Errorf("%s: %s", msg, a.Message)
 	}
 }
+
+func Nil[T any](actual *T) AssertionMessage {
+	return Assert(actual == nil, "got <%T>, wanted nil", actual)
+}
+
+func NotNil[T any](actual *T) AssertionMessage {
+	return Assert(actual != nil, "got nil, wanted <%T>", actual)
+}

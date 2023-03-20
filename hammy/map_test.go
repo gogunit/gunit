@@ -23,7 +23,7 @@ func Test_Map_WithKeys_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).WithKeys("abc", "ghi"))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got <[abc]>, wanted keys <[ghi]>")
 }
 
 func Test_Map_WithKeys_success(t *testing.T) {
@@ -35,7 +35,7 @@ func Test_Map_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).IsEmpty())
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got len=<2>, wanted empty map")
 }
 
 func Test_Map_IsEmpty_success(t *testing.T) {
@@ -47,7 +47,7 @@ func Test_Map_WithValues_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]int{"abc": 42, "def": 33}).WithValues(4, 3))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got <[]>, wanted values <[4 3]>")
 }
 
 func Test_Map_WithValues_success(t *testing.T) {
@@ -59,7 +59,7 @@ func Test_Map_WithoutKeys_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]int{"abc": 42, "def": 33}).WithoutKeys("abc", "def", "jkl"))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got keys <[abc def]>, wanted absent from map")
 }
 
 func Test_Map_WithoutKeys_success(t *testing.T) {
@@ -71,7 +71,7 @@ func Test_Map_Len_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]int{}).Len(2))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got len=<0>, wanted <2>")
 }
 
 func Test_Map_Len_success(t *testing.T) {
@@ -79,18 +79,18 @@ func Test_Map_Len_success(t *testing.T) {
 	assert.Is(hammy.Map(map[string]int{"hi": 1}).Len(1))
 }
 
-func Test_Map_HasItem_value_failure(t *testing.T) {
+func Test_Map_WithItem_value_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]int{"hi": 1}).WithItem("hi", 2))
-	aSpy.HadErrorContaining(t, "want value=<2> for key=<hi>, got <1>")
+	aSpy.HadErrorContaining(t, "got value=<1> for key=<hi>, wanted <2>")
 }
 
-func Test_Map_HasItem_key_failure(t *testing.T) {
+func Test_Map_WithItem_key_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Map(map[string]int{"hi": 1}).WithItem("bye", 2))
-	aSpy.HadErrorContaining(t, "want key=<bye>, but was absent")
+	aSpy.HadErrorContaining(t, "got key absent, wanted value for key <bye>")
 }
 
 func Test_Map_HasItem_success(t *testing.T) {

@@ -15,7 +15,7 @@ func Test_Struct_EqualTo_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Struct(aType{1}).EqualTo(aType{2}))
-	aSpy.HadErrorContaining(t, "Struct mismatch (-want +got):\n")
+	aSpy.HadErrorContaining(t, "Structs are not equal (+got -want):\n")
 }
 
 func Test_Struct_EqualTo_success(t *testing.T) {
