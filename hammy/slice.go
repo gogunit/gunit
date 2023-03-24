@@ -42,3 +42,8 @@ func (a *Slc[I]) Len(expected int) AssertionMessage {
 	sz := len(a.actual)
 	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
 }
+
+func (a *Slc[I]) IsEmpty() AssertionMessage {
+	sz := len(a.actual)
+	return Assert(sz == 0, "got len()=%d, want 0", sz)
+}

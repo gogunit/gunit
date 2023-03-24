@@ -1,9 +1,10 @@
 package hammy_test
 
 import (
+	"testing"
+
 	"github.com/gogunit/gunit/eye"
 	ham "github.com/gogunit/gunit/hammy"
-	"testing"
 )
 
 func Test_int_EqualTo_success(t *testing.T) {
@@ -90,4 +91,5 @@ func Test_float64_Within_success(t *testing.T) {
 func Test_float32_Within_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	ham.New(aSpy).Is(ham.Number(123).Within(140, 0.2))
+	aSpy.HadError(t)
 }

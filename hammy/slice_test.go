@@ -19,6 +19,18 @@ func Test_Slice_Len_success(t *testing.T) {
 	assert.Is(hammy.Slice([]int{1, 2, 3}).Len(3))
 }
 
+func Test_Slice_IsEmpty_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Slice([]string{"hello"}).IsEmpty())
+	aSpy.HadErrorContaining(t, "got len()=1, want 0")
+}
+
+func Test_Slice_IsEmpty_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Slice([]int{}).IsEmpty())
+}
+
 func Test_Slice_Contains_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
