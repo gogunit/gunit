@@ -31,3 +31,11 @@ func Nil[T any](actual *T) AssertionMessage {
 func NotNil[T any](actual *T) AssertionMessage {
 	return Assert(actual != nil, "got nil, wanted <%T>", actual)
 }
+
+func True(actual bool) AssertionMessage {
+	return Assert(actual, "got false, wanted true")
+}
+
+func False(actual bool) AssertionMessage {
+	return Assert(!actual, "got true, wanted false")
+}
