@@ -38,6 +38,11 @@ func Test_Slice_EqualTo_failure(t *testing.T) {
 	aSpy.HadError(t)
 }
 
+func Test_Slice_EqualTo_string_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Slice([]string{"hello"}).EqualTo("hello"))
+}
+
 func Test_Slice_EqualTo_success(t *testing.T) {
 	assert := hammy.New(t)
 	assert.Is(hammy.Slice([]int{1, 2, 3}).EqualTo(1, 2, 3))

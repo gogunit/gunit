@@ -33,7 +33,7 @@ func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 	return Assert(isSuccessful, "want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched)
 }
 
-func (a *Slc[I]) EqualTo(expected ...int) AssertionMessage {
+func (a *Slc[I]) EqualTo(expected ...I) AssertionMessage {
 	diff := cmp.Diff(expected, a.actual)
 	return Assert(diff == "", "slice mismatch (-want +got):\\n%s", diff)
 }
