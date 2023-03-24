@@ -11,7 +11,7 @@ func Test_Slice_Len_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Slice([]int{1, 2, 3}).Len(2))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got len()=3, wanted 2")
 }
 
 func Test_Slice_Len_success(t *testing.T) {
@@ -23,7 +23,7 @@ func Test_Slice_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Slice([]string{"hello"}).IsEmpty())
-	aSpy.HadErrorContaining(t, "got len()=1, want 0")
+	aSpy.HadErrorContaining(t, "got len()=1, wanted 0")
 }
 
 func Test_Slice_IsEmpty_success(t *testing.T) {
@@ -35,7 +35,7 @@ func Test_Slice_Contains_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
 	assert.Is(hammy.Slice([]int{1, 2, 3}).Contains(2, 3, 4))
-	aSpy.HadError(t)
+	aSpy.HadErrorContaining(t, "got 1 unmatched items, wanted array containing the 3 items. Items at index 2 were missing")
 }
 
 func Test_Slice_Contains_success(t *testing.T) {

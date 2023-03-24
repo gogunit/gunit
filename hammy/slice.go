@@ -1,6 +1,8 @@
 package hammy
 
 import (
+	"fmt"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -30,7 +32,21 @@ func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 			unmatched = append(unmatched, i)
 		}
 	}
-	return Assert(isSuccessful, "want <%v> matched, but no match found for expected items <%v>", len(expected), unmatched)
+	return Assert(isSuccessful, "got %v unmatched items, wanted array containing the %v items. Items at index %v were missing", len(unmatched), len(expected), Join(unmatched, ", "))
+}
+
+func Join[T any](a []T, sep string) string {
+	var s = ""
+	if len(a) < 1 {
+		return s
+	}
+	var i = 0
+	for ; i < len(a)-2; i++ {
+		s += fmt.Sprintf("%v%s", a[i], sep)
+	}
+	s += fmt.Sprintf("%v", a[i])
+
+	return s
 }
 
 func (a *Slc[I]) EqualTo(expected ...I) AssertionMessage {
@@ -40,10 +56,10 @@ func (a *Slc[I]) EqualTo(expected ...I) AssertionMessage {
 
 func (a *Slc[I]) Len(expected int) AssertionMessage {
 	sz := len(a.actual)
-	return Assert(sz == expected, "want len of <%v>, got <%v>", sz, expected)
+	return Assert(sz == expected, "got len()=%d, wanted %d", sz, expected)
 }
 
 func (a *Slc[I]) IsEmpty() AssertionMessage {
 	sz := len(a.actual)
-	return Assert(sz == 0, "got len()=%d, want 0", sz)
+	return Assert(sz == 0, "got len()=%d, wanted 0", sz)
 }
