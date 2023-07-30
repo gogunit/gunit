@@ -6,7 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/gogunit/gunit)](https://goreportcard.com/report/github.com/gogunit/gunit)
 [![GoDoc reference example](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/gogunit/gunit/)
 
-Go unit test assertions library.
+gounit is test assertions library for Go. It was developed to address the shortcoming of many assertion frameworks that employ assertion of types at runtime rather than compile time.
 
 ## Examples
 
