@@ -59,3 +59,22 @@ func Test_Slice_EqualTo_success(t *testing.T) {
 	assert := hammy.New(t)
 	assert.Is(hammy.Slice([]int{1, 2, 3}).EqualTo(1, 2, 3))
 }
+
+func Test_Slice_ContainsExactly_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Slice([]int{3, 2, 1}).ContainsExactly(1, 2, 3))
+}
+
+func Test_Slice_ContainsExactly_failure_with_differing_items(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Slice([]int{2, 3, 4}).ContainsExactly(1, 2, 3))
+	aSpy.HadError(t)
+}
+
+func Test_Slice_ContainsExactly_failure_with_differing_length(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Slice([]int{2, 3, 4}).ContainsExactly(2, 3))
+	aSpy.HadError(t)
+}
