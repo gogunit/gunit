@@ -7,6 +7,18 @@ import (
 	"github.com/gogunit/gunit/hammy"
 )
 
+func Test_Not_False_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.IsNot(hammy.False(false))
+	aSpy.HadErrorContaining(t, "not(got true, wanted false)")
+}
+
+func Test_Not_False_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.IsNot(hammy.False(true))
+}
+
 func Test_Nil_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)

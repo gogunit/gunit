@@ -17,6 +17,13 @@ func (h *Hammy) Is(a AssertionMessage) {
 	}
 }
 
+func (h *Hammy) IsNot(a AssertionMessage) {
+	h.Helper()
+	if a.IsSuccessful {
+		h.Errorf("not(" + a.Message + ")")
+	}
+}
+
 func (h *Hammy) That(msg string, a AssertionMessage) {
 	h.Helper()
 	if !a.IsSuccessful {

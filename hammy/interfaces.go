@@ -13,13 +13,10 @@ type Stringy interface {
 }
 
 func Assert(isSuccessful bool, str string, args ...any) AssertionMessage {
-	msg := AssertionMessage{
+	return AssertionMessage{
 		IsSuccessful: isSuccessful,
+		Message:      fmt.Sprintf(str, args...),
 	}
-	if !isSuccessful {
-		msg.Message = fmt.Sprintf(str, args...)
-	}
-	return msg
 }
 
 type AssertionMessage struct {
