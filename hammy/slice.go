@@ -36,6 +36,20 @@ func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 	return Assert(isSuccessful, "got %v unmatched items, wanted array containing the %v items. Items at index %v were missing", len(unmatched), len(expected), Join(unmatched, ", "))
 }
 
+// NotContains asserts that none of the expected elements are present.
+func (a *Slc[I]) NotContains(expected ...I) AssertionMessage {
+	var matched []int
+	for i, e := range expected {
+		for _, item := range a.actual {
+			if cmp.Equal(item, e) {
+				matched = append(matched, i)
+				break
+			}
+		}
+	}
+	return Assert(len(matched) == 0, "got items at expected index %v present in slice, wanted all absent", Join(matched, ", "))
+}
+
 func Join[T any](a []T, sep string) string {
 	var s = ""
 	if len(a) < 1 {

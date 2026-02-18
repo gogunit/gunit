@@ -18,6 +18,10 @@ func (s *Str[S]) Contains(expected string) AssertionMessage {
 	return Assert(strings.Contains(string(s.actual), expected), "got <%s>, wanted substring <%s>", s.actual, expected)
 }
 
+func (s *Str[S]) NotContains(expected string) AssertionMessage {
+	return Assert(!strings.Contains(string(s.actual), expected), "got <%s>, wanted no substring <%s>", s.actual, expected)
+}
+
 func (s *Str[S]) HasPrefix(expected string) AssertionMessage {
 	return Assert(strings.HasPrefix(string(s.actual), expected), "got <%s>, wanted prefix <%s>", s.actual, expected)
 }

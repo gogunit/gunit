@@ -43,6 +43,18 @@ func Test_string_Contains_success(t *testing.T) {
 	assert.Is(hammy.String("hello world").Contains("world"))
 }
 
+func Test_string_NotContains_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.String("hello world").NotContains("goodbye"))
+}
+
+func Test_string_NotContains_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.String("hello world").NotContains("world"))
+	aSpy.HadErrorContaining(t, "got <hello world>, wanted no substring <world>")
+}
+
 func Test_string_HasPrefix_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)

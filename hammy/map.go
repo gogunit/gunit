@@ -103,6 +103,22 @@ func (m Mappy[K, V]) WithValues(values ...V) AssertionMessage {
 	return Assert(len(missing) == 0, "got <%v>, wanted values <%v>", found, missing)
 }
 
+func (m Mappy[K, V]) NotContains(values ...V) AssertionMessage {
+	var present []V
+	has := make(map[int]bool)
+	for _, actual := range m.actual {
+		for i, expected := range values {
+			if cmp.Equal(actual, expected) {
+				if !has[i] {
+					present = append(present, expected)
+				}
+				has[i] = true
+			}
+		}
+	}
+	return Assert(len(present) == 0, "got values <%v>, wanted absent from map", present)
+}
+
 func (m Mappy[K, V]) WithoutKeys(keys ...K) AssertionMessage {
 	var present []K
 	has := make(map[K]bool, len(m.actual))

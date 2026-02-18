@@ -110,6 +110,18 @@ func Test_Map_WithValues_success(t *testing.T) {
 	assert.Is(hammy.Map(map[string]int{"abc": 42, "def": 33}).WithValues(42, 33))
 }
 
+func Test_Map_NotContains_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Map(map[string]int{"abc": 42, "def": 33}).NotContains(7, 8))
+}
+
+func Test_Map_NotContains_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]int{"abc": 42, "def": 33}).NotContains(33, 7))
+	aSpy.HadErrorContaining(t, "got values <[33]>, wanted absent from map")
+}
+
 func Test_Map_WithoutKeys_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)

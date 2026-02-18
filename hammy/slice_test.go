@@ -55,6 +55,18 @@ func Test_Slice_Contains_success(t *testing.T) {
 	assert.Is(hammy.Slice([]int{1, 2, 3}).Contains(2, 3))
 }
 
+func Test_Slice_NotContains_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Slice([]int{1, 2, 3}).NotContains(4, 5))
+}
+
+func Test_Slice_NotContains_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Slice([]int{1, 2, 3}).NotContains(2, 4))
+	aSpy.HadErrorContaining(t, "got items at expected index 0 present in slice, wanted all absent")
+}
+
 func Test_Slice_EqualTo_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
