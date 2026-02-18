@@ -1,6 +1,10 @@
 package hammy
 
-import "github.com/gogunit/gunit"
+import (
+	"reflect"
+
+	"github.com/gogunit/gunit"
+)
 
 func New(t gunit.T) *Hammy {
 	return &Hammy{t}
@@ -31,12 +35,12 @@ func (h *Hammy) That(msg string, a AssertionMessage) {
 	}
 }
 
-func Nil[T any](actual *T) AssertionMessage {
-	return Assert(actual == nil, "got <%T>, wanted nil", actual)
+func Nil(actual any) AssertionMessage {
+	return Assert(isNil(actual), "got <%T>, wanted nil", actual)
 }
 
-func NotNil[T any](actual *T) AssertionMessage {
-	return Assert(actual != nil, "got nil, wanted <%T>", actual)
+func NotNil(actual any) AssertionMessage {
+	return Assert(!isNil(actual), "got nil, wanted <%T>", actual)
 }
 
 func True(actual bool) AssertionMessage {
@@ -45,4 +49,18 @@ func True(actual bool) AssertionMessage {
 
 func False(actual bool) AssertionMessage {
 	return Assert(!actual, "got true, wanted false")
+}
+
+func isNil(actual any) bool {
+	if actual == nil {
+		return true
+	}
+
+	value := reflect.ValueOf(actual)
+	switch value.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return value.IsNil()
+	default:
+		return false
+	}
 }

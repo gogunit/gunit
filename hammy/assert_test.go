@@ -46,6 +46,73 @@ func Test_NotNil_failure(t *testing.T) {
 	aSpy.HadErrorContaining(t, "got nil, wanted <*int>")
 }
 
+func Test_Nil_interface_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value any
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_Nil_typed_interface_success(t *testing.T) {
+	assert := hammy.New(t)
+	var i *int
+	var value any = i
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_Nil_map_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value map[string]int
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_Nil_slice_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value []int
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_Nil_chan_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value chan int
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_Nil_func_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value func()
+	assert.Is(hammy.Nil(value))
+}
+
+func Test_NotNil_interface_success(t *testing.T) {
+	assert := hammy.New(t)
+	var value any = "hello"
+	assert.Is(hammy.NotNil(value))
+}
+
+func Test_NotNil_map_success(t *testing.T) {
+	assert := hammy.New(t)
+	value := map[string]int{}
+	assert.Is(hammy.NotNil(value))
+}
+
+func Test_NotNil_slice_success(t *testing.T) {
+	assert := hammy.New(t)
+	value := []int{}
+	assert.Is(hammy.NotNil(value))
+}
+
+func Test_NotNil_chan_success(t *testing.T) {
+	assert := hammy.New(t)
+	value := make(chan int)
+	assert.Is(hammy.NotNil(value))
+}
+
+func Test_NotNil_func_success(t *testing.T) {
+	assert := hammy.New(t)
+	value := func() {}
+	assert.Is(hammy.NotNil(value))
+}
+
 func Test_True_success(t *testing.T) {
 	assert := hammy.New(t)
 	assert.Is(hammy.True(true))
