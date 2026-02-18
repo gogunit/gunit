@@ -4,135 +4,135 @@ import (
 	"testing"
 
 	"github.com/gogunit/gunit/eye"
-	"github.com/gogunit/gunit/hammy"
+	a "github.com/gogunit/gunit/hammy"
 )
 
 func Test_Not_False_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
-	assert.IsNot(hammy.False(false))
+	assert := a.New(aSpy)
+	assert.IsNot(a.False(false))
 	aSpy.HadErrorContaining(t, "not(got true, wanted false)")
 }
 
 func Test_Not_False_success(t *testing.T) {
-	assert := hammy.New(t)
-	assert.IsNot(hammy.False(true))
+	assert := a.New(t)
+	assert.IsNot(a.False(true))
 }
 
 func Test_Nil_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
-	assert.Is(hammy.Nil(t))
+	assert := a.New(aSpy)
+	assert.Is(a.Nil(t))
 	aSpy.HadErrorContaining(t, "got <*testing.T>, wanted nil")
 }
 
 func Test_Nil_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var i *int = nil
-	assert.Is(hammy.Nil(i))
+	assert.Is(a.Nil(i))
 }
 
 func Test_NotNil_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var i = 1
-	assert.Is(hammy.NotNil(&i))
+	assert.Is(a.NotNil(&i))
 }
 
 func Test_NotNil_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
+	assert := a.New(aSpy)
 	var i *int = nil
-	assert.Is(hammy.NotNil(i))
+	assert.Is(a.NotNil(i))
 	aSpy.HadErrorContaining(t, "got nil, wanted <*int>")
 }
 
 func Test_Nil_interface_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value any
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_Nil_typed_interface_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var i *int
 	var value any = i
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_Nil_map_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value map[string]int
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_Nil_slice_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value []int
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_Nil_chan_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value chan int
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_Nil_func_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value func()
-	assert.Is(hammy.Nil(value))
+	assert.Is(a.Nil(value))
 }
 
 func Test_NotNil_interface_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	var value any = "hello"
-	assert.Is(hammy.NotNil(value))
+	assert.Is(a.NotNil(value))
 }
 
 func Test_NotNil_map_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	value := map[string]int{}
-	assert.Is(hammy.NotNil(value))
+	assert.Is(a.NotNil(value))
 }
 
 func Test_NotNil_slice_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	value := []int{}
-	assert.Is(hammy.NotNil(value))
+	assert.Is(a.NotNil(value))
 }
 
 func Test_NotNil_chan_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	value := make(chan int)
-	assert.Is(hammy.NotNil(value))
+	assert.Is(a.NotNil(value))
 }
 
 func Test_NotNil_func_success(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	value := func() {}
-	assert.Is(hammy.NotNil(value))
+	assert.Is(a.NotNil(value))
 }
 
 func Test_True_success(t *testing.T) {
-	assert := hammy.New(t)
-	assert.Is(hammy.True(true))
+	assert := a.New(t)
+	assert.Is(a.True(true))
 }
 
 func Test_True_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
-	assert.Is(hammy.True(false))
+	assert := a.New(aSpy)
+	assert.Is(a.True(false))
 	aSpy.HadErrorContaining(t, "got false, wanted true")
 }
 
 func Test_False_success(t *testing.T) {
-	assert := hammy.New(t)
-	assert.Is(hammy.False(false))
+	assert := a.New(t)
+	assert.Is(a.False(false))
 }
 
 func Test_False_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
-	assert.Is(hammy.False(true))
+	assert := a.New(aSpy)
+	assert.Is(a.False(true))
 	aSpy.HadErrorContaining(t, "got true, wanted false")
 }

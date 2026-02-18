@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/gogunit/gunit/eye"
-	"github.com/gogunit/gunit/hammy"
+	a "github.com/gogunit/gunit/hammy"
 )
 
 type aType struct {
@@ -13,12 +13,12 @@ type aType struct {
 
 func Test_Struct_EqualTo_failure(t *testing.T) {
 	aSpy := eye.Spy()
-	assert := hammy.New(aSpy)
-	assert.Is(hammy.Struct(aType{1}).EqualTo(aType{2}))
+	assert := a.New(aSpy)
+	assert.Is(a.Struct(aType{1}).EqualTo(aType{2}))
 	aSpy.HadErrorContaining(t, "Structs are not equal (+got -want):\n")
 }
 
 func Test_Struct_EqualTo_success(t *testing.T) {
-	assert := hammy.New(t)
-	assert.Is(hammy.Struct(aType{1}).EqualTo(aType{1}))
+	assert := a.New(t)
+	assert.Is(a.Struct(aType{1}).EqualTo(aType{1}))
 }
