@@ -31,6 +31,49 @@ func Test_Map_WithKeys_success(t *testing.T) {
 	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).WithKeys("abc", "def"))
 }
 
+func Test_Map_HasKey_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).HasKey("abc"))
+}
+
+func Test_Map_HasKey_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).HasKey("ghi"))
+	aSpy.HadErrorContaining(t, "got key absent <ghi>, wanted present in map")
+}
+
+func Test_Map_NotHasKey_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).NotHasKey("ghi"))
+}
+
+func Test_Map_NotHasKey_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).NotHasKey("abc"))
+	aSpy.HadErrorContaining(t, "got key present <abc>, wanted absent from map")
+}
+
+func Test_Map_KeysExactly_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).KeysExactly("abc", "def"))
+}
+
+func Test_Map_KeysExactly_failure_missing_key(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]bool{"abc": true}).KeysExactly("abc", "def"))
+	aSpy.HadErrorContaining(t, "missing keys <[def]>")
+}
+
+func Test_Map_KeysExactly_failure_extra_key(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]bool{"abc": true, "def": true}).KeysExactly("abc"))
+	aSpy.HadErrorContaining(t, "extra keys <[def]>")
+}
+
 func Test_Map_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)

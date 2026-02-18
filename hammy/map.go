@@ -35,6 +35,44 @@ func (m Mappy[K, V]) WithKeys(expected ...K) AssertionMessage {
 	return Assert(len(missing) == 0, "got <%v>, wanted keys <%v>", found, missing)
 }
 
+func (m Mappy[K, V]) HasKey(key K) AssertionMessage {
+	_, ok := m.actual[key]
+	return Assert(ok, "got key absent <%v>, wanted present in map", key)
+}
+
+func (m Mappy[K, V]) NotHasKey(key K) AssertionMessage {
+	_, ok := m.actual[key]
+	return Assert(!ok, "got key present <%v>, wanted absent from map", key)
+}
+
+func (m Mappy[K, V]) KeysExactly(expected ...K) AssertionMessage {
+	actualKeys := make(map[K]bool, len(m.actual))
+	for k := range m.actual {
+		actualKeys[k] = true
+	}
+
+	expectedKeys := make(map[K]bool, len(expected))
+	for _, k := range expected {
+		expectedKeys[k] = true
+	}
+
+	var missing []K
+	for k := range expectedKeys {
+		if !actualKeys[k] {
+			missing = append(missing, k)
+		}
+	}
+
+	var extra []K
+	for k := range actualKeys {
+		if !expectedKeys[k] {
+			extra = append(extra, k)
+		}
+	}
+
+	return Assert(len(missing) == 0 && len(extra) == 0, "got extra keys <%v> and missing keys <%v>, wanted exact key set", extra, missing)
+}
+
 func (m Mappy[K, V]) IsEmpty() AssertionMessage {
 	return Assert(len(m.actual) == 0, "got len=<%d>, wanted empty map", len(m.actual))
 }
