@@ -30,6 +30,10 @@ func (s *Str[S]) IsEmpty() AssertionMessage {
 	return Assert(len(s.actual) == 0, "got <%s>, wanted an empty string", s.actual)
 }
 
+func (s *Str[S]) NotEmpty() AssertionMessage {
+	return Assert(len(s.actual) != 0, "got an empty string, wanted non-empty string")
+}
+
 func (s *Str[S]) ToLowerEqualTo(expected string) AssertionMessage {
 	lowerActual := strings.ToLower(string(s.actual))
 	lowerExpected := strings.ToLower(expected)

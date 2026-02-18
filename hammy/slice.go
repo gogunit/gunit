@@ -68,6 +68,12 @@ func (a *Slc[I]) IsEmpty() AssertionMessage {
 	return Assert(sz == 0, "got len()=%d, wanted 0", sz)
 }
 
+// NotEmpty asserts that the slice contains at least one element.
+func (a *Slc[I]) NotEmpty() AssertionMessage {
+	sz := len(a.actual)
+	return Assert(sz > 0, "got len()=%d, wanted > 0", sz)
+}
+
 // ContainsExactly asserts that the slice contains the exact number of elements in any order.
 func (a *Slc[I]) ContainsExactly(expected ...I) AssertionMessage {
 	szActual := len(a.actual)

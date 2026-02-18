@@ -43,6 +43,18 @@ func Test_Map_IsEmpty_success(t *testing.T) {
 	assert.Is(hammy.Map(map[string]int{}).IsEmpty())
 }
 
+func Test_Map_NotEmpty_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.Map(map[string]int{"abc": 1}).NotEmpty())
+}
+
+func Test_Map_NotEmpty_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.Map(map[string]int{}).NotEmpty())
+	aSpy.HadErrorContaining(t, "got len=<0>, wanted non-empty map")
+}
+
 func Test_Map_WithValues_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)

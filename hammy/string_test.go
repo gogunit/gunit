@@ -78,3 +78,15 @@ func Test_string_IsEmpty_success(t *testing.T) {
 	assert := hammy.New(t)
 	assert.Is(hammy.String("").IsEmpty())
 }
+
+func Test_string_NotEmpty_success(t *testing.T) {
+	assert := hammy.New(t)
+	assert.Is(hammy.String("hello world").NotEmpty())
+}
+
+func Test_string_NotEmpty_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(hammy.String("").NotEmpty())
+	aSpy.HadErrorContaining(t, "got an empty string, wanted non-empty string")
+}

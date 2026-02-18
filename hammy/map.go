@@ -39,6 +39,10 @@ func (m Mappy[K, V]) IsEmpty() AssertionMessage {
 	return Assert(len(m.actual) == 0, "got len=<%d>, wanted empty map", len(m.actual))
 }
 
+func (m Mappy[K, V]) NotEmpty() AssertionMessage {
+	return Assert(len(m.actual) > 0, "got len=<%d>, wanted non-empty map", len(m.actual))
+}
+
 func (m Mappy[K, V]) WithValues(values ...V) AssertionMessage {
 	var found []V
 	var missing []V
