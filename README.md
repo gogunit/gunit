@@ -27,3 +27,41 @@ func Test_nine_plus_two_is_greater_than_ten(t *testing.T) {
 }
 
 ```
+
+## Hammy Examples
+
+```go
+package adder
+
+import (
+	"testing"
+
+	a "github.com/gogunit/gunit/hammy"
+)
+
+func Test_add_returns_expected_sum(t *testing.T) {
+	assert := a.New(t)
+	actual := Add(2, 3)
+	assert.Is(a.Number(actual).EqualTo(5))
+}
+```
+
+```go
+package service
+
+import (
+	"errors"
+	"fmt"
+	"testing"
+
+	a "github.com/gogunit/gunit/hammy"
+)
+
+var errTimeout = errors.New("timeout")
+
+func Test_run_wraps_timeout_error(t *testing.T) {
+	assert := a.New(t)
+	err := fmt.Errorf("request failed: %w", errTimeout)
+	assert.Is(a.ErrorIs(err, errTimeout))
+}
+```

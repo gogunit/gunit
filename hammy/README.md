@@ -11,13 +11,13 @@ The aim is to provide terse compile-time oriented type checking.
 package adder
 
 import (
-	"github.com/gogunit/gunit/hammy"
+	a "github.com/gogunit/gunit/hammy"
 )
 
 func Test_calculator(t *testing.T) {
-	assert := hammy.New(t)
+	assert := a.New(t)
 	actual := Add(2, 3)
-	assert.Is(hammy.Number(actual).EqualTo(5))
+	assert.Is(a.Number(actual).EqualTo(5))
 }
 ```
 
@@ -65,7 +65,7 @@ func Test_calculator(t *testing.T) {
 ```go
 package model
 
-import "github.com/gogunit/gunit/hammy"
+import a "github.com/gogunit/gunit/hammy"
 
 func Matcher(model Model) *Matchy {
 	return &Matchy{
@@ -77,9 +77,9 @@ type Matchy struct {
 	model Model
 }
 
-func (m *Matcher) HasName(expected string) hammy.AssertionMessage {
+func (m *Matcher) HasName(expected string) a.AssertionMessage {
 	actual := m.model.Name
-	return hammy.Assert(actual == expected, "want Name=<%v> equal to <%v>", actual, expected)
+	return a.Assert(actual == expected, "want Name=<%v> equal to <%v>", actual, expected)
 }
 ```
 
