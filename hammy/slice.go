@@ -2,15 +2,16 @@ package hammy
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/google/go-cmp/cmp"
 )
 
-func Slice[I comparable](actual []I) *Slc[I] {
+func Slice[I any](actual []I) *Slc[I] {
 	return &Slc[I]{actual}
 }
 
-type Slc[I comparable] struct {
+type Slc[I any] struct {
 	actual []I
 }
 
@@ -51,17 +52,15 @@ func (a *Slc[I]) NotContains(expected ...I) AssertionMessage {
 }
 
 func Join[T any](a []T, sep string) string {
-	var s = ""
 	if len(a) < 1 {
-		return s
+		return ""
 	}
-	var i = 0
-	for ; i < len(a)-2; i++ {
-		s += fmt.Sprintf("%v%s", a[i], sep)
-	}
-	s += fmt.Sprintf("%v", a[i])
 
-	return s
+	parts := make([]string, 0, len(a))
+	for _, item := range a {
+		parts = append(parts, fmt.Sprintf("%v", item))
+	}
+	return strings.Join(parts, sep)
 }
 
 // EqualTo asserts whether the slice is equal to the expected items in both order and values.
@@ -97,4 +96,20 @@ func (a *Slc[I]) ContainsExactly(expected ...I) AssertionMessage {
 	}
 
 	return a.Contains(expected...)
+}
+
+func (a *Slc[I]) Every(matcher Matcher[I]) AssertionMessage {
+	return Every(matcher).Match(a.actual)
+}
+
+func (a *Slc[I]) HasItem(matcher Matcher[I]) AssertionMessage {
+	return HasItem(matcher).Match(a.actual)
+}
+
+func (a *Slc[I]) ContainsInOrder(matchers ...Matcher[I]) AssertionMessage {
+	return ContainsInOrder(matchers...).Match(a.actual)
+}
+
+func (a *Slc[I]) ContainsInAnyOrder(matchers ...Matcher[I]) AssertionMessage {
+	return ContainsInAnyOrder(matchers...).Match(a.actual)
 }

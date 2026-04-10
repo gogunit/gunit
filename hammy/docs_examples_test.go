@@ -343,7 +343,97 @@ func ExampleMappy_EqualTo() {
 	// Output: true
 }
 
+func ExampleEvery() {
+	printExample(a.Match([]int{2, 4, 6}, a.Every(a.GreaterThan(1))))
+	// Output: true
+}
+
+func ExampleHasItem() {
+	printExample(a.Match([]string{"alpha", "beta"}, a.HasItem(a.HasPrefix("bet"))))
+	// Output: true
+}
+
+func ExampleContainsInOrder() {
+	printExample(a.Match([]string{"alpha", "beta"}, a.ContainsInOrder(
+		a.EqualTo("alpha"),
+		a.HasSuffix("ta"),
+	)))
+	// Output: true
+}
+
+func ExampleContainsInAnyOrder() {
+	printExample(a.Match([]int{2, 1, 2}, a.ContainsInAnyOrder(
+		a.EqualTo(2),
+		a.EqualTo(2),
+		a.EqualTo(1),
+	)))
+	// Output: true
+}
+
+func ExampleHasEntry() {
+	printExample(a.Match(map[string]int{"alpha": 1, "beta": 2}, a.HasEntry(
+		a.EqualTo("beta"),
+		a.GreaterThan(1),
+	)))
+	// Output: true
+}
+
+func ExampleHasKeyMatching() {
+	printExample(a.Match(map[string]int{"alpha": 1}, a.HasKeyMatching[string, int](a.HasSuffix("pha"))))
+	// Output: true
+}
+
+func ExampleHasValueMatching() {
+	printExample(a.Match(map[string]int{"alpha": 3}, a.HasValueMatching[string, int](a.GreaterThan(2))))
+	// Output: true
+}
+
 func ExampleSt_EqualTo() {
 	printExample(a.Struct(examplePerson{Name: "Ada", Age: 37}).EqualTo(examplePerson{Name: "Ada", Age: 37}))
+	// Output: true
+}
+
+func ExampleSlc_Every() {
+	printExample(a.Slice([]int{2, 4, 6}).Every(a.GreaterThan(1)))
+	// Output: true
+}
+
+func ExampleSlc_HasItem() {
+	printExample(a.Slice([]string{"alpha", "beta"}).HasItem(a.HasPrefix("bet")))
+	// Output: true
+}
+
+func ExampleSlc_ContainsInOrder() {
+	printExample(a.Slice([]string{"alpha", "beta"}).ContainsInOrder(
+		a.EqualTo("alpha"),
+		a.HasSuffix("ta"),
+	))
+	// Output: true
+}
+
+func ExampleSlc_ContainsInAnyOrder() {
+	printExample(a.Slice([]int{2, 1, 2}).ContainsInAnyOrder(
+		a.EqualTo(2),
+		a.EqualTo(2),
+		a.EqualTo(1),
+	))
+	// Output: true
+}
+
+func ExampleMappy_HasEntry() {
+	printExample(a.Map(map[string]int{"alpha": 1, "beta": 2}).HasEntry(
+		a.EqualTo("beta"),
+		a.GreaterThan(1),
+	))
+	// Output: true
+}
+
+func ExampleMappy_HasKeyMatching() {
+	printExample(a.Map(map[string]int{"alpha": 1}).HasKeyMatching(a.HasSuffix("pha")))
+	// Output: true
+}
+
+func ExampleMappy_HasValueMatching() {
+	printExample(a.Map(map[string]int{"alpha": 3}).HasValueMatching(a.GreaterThan(2)))
 	// Output: true
 }

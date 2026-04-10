@@ -154,3 +154,15 @@ func (m Mappy[K, V]) EqualTo(expected map[K]V) AssertionMessage {
 	diff := cmp.Diff(expected, m.actual)
 	return Assert(diff == "", "Map mismatch (-want +got):\n%s", diff)
 }
+
+func (m Mappy[K, V]) HasEntry(keyMatcher Matcher[K], valueMatcher Matcher[V]) AssertionMessage {
+	return HasEntry[K, V](keyMatcher, valueMatcher).Match(m.actual)
+}
+
+func (m Mappy[K, V]) HasKeyMatching(matcher Matcher[K]) AssertionMessage {
+	return HasKeyMatching[K, V](matcher).Match(m.actual)
+}
+
+func (m Mappy[K, V]) HasValueMatching(matcher Matcher[V]) AssertionMessage {
+	return HasValueMatching[K, V](matcher).Match(m.actual)
+}

@@ -1,6 +1,7 @@
 package hammy
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
@@ -166,4 +167,11 @@ func NotEmptyString() Matcher[string] {
 	return MatchFunc(func(actual string) AssertionMessage {
 		return Assert(actual != "", "got an empty string, wanted non-empty string")
 	})
+}
+
+func formatMatcherFailure(prefix string, result AssertionMessage) string {
+	if result.Message == "" {
+		return prefix
+	}
+	return fmt.Sprintf("%s: %s", prefix, result.Message)
 }

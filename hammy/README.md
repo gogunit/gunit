@@ -38,12 +38,15 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 ## Map
 
 * [x] EqualTo
+* [x] HasEntry
+* [x] HasKeyMatching
 * [x] IsEmpty
 * [x] Len
 * [x] WithItem
 * [x] WithKeys
 * [x] WithoutKeys
 * [x] WithValues
+* [x] HasValueMatching
 
 ## Number
 
@@ -58,7 +61,11 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 ## Slice
 
 * [x] Contains
+* [x] ContainsInAnyOrder
+* [x] ContainsInOrder
 * [x] EqualTo
+* [x] Every
+* [x] HasItem
 * [x] Len
 
 ## String
