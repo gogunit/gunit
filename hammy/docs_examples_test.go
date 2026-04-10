@@ -3,6 +3,7 @@ package hammy_test
 import (
 	"errors"
 	"fmt"
+	"math"
 
 	a "github.com/gogunit/gunit/hammy"
 )
@@ -20,6 +21,16 @@ type exampleError struct{}
 
 func (exampleError) Error() string {
 	return "example error"
+}
+
+type exampleGreeter interface {
+	Greet() string
+}
+
+type exampleGreeterImpl struct{}
+
+func (exampleGreeterImpl) Greet() string {
+	return "hello"
 }
 
 func printExample(result a.AssertionMessage) {
@@ -199,6 +210,44 @@ func ExampleEqualIgnoringWhitespace() {
 
 func ExampleEqualNormalizedWhitespace() {
 	printExample(a.Match(" hello\tworld \n", a.EqualNormalizedWhitespace("hello world")))
+	// Output: true
+}
+
+func ExampleCloseTo() {
+	printExample(a.Match(10.0, a.CloseTo(10.1, 0.2)))
+	// Output: true
+}
+
+func ExampleIsNaN() {
+	printExample(a.Match(math.NaN(), a.IsNaN[float64]()))
+	// Output: true
+}
+
+func ExampleIsInf() {
+	printExample(a.Match(math.Inf(1), a.IsInf[float64]()))
+	// Output: true
+}
+
+func ExampleIsInfSign() {
+	printExample(a.Match(math.Inf(-1), a.IsInfSign[float64](-1)))
+	// Output: true
+}
+
+func ExampleSamePointer() {
+	value := 42
+	printExample(a.Match(&value, a.SamePointer(&value)))
+	// Output: true
+}
+
+func ExampleTypeOf() {
+	var value any = examplePerson{Name: "Ada"}
+	printExample(a.Match(value, a.TypeOf[examplePerson]()))
+	// Output: true
+}
+
+func ExampleAssignableTo() {
+	var value any = exampleGreeterImpl{}
+	printExample(a.Match(value, a.AssignableTo[exampleGreeter]()))
 	// Output: true
 }
 
@@ -515,5 +564,25 @@ func ExampleMappy_HasKeyMatching() {
 
 func ExampleMappy_HasValueMatching() {
 	printExample(a.Map(map[string]int{"alpha": 3}).HasValueMatching(a.GreaterThan(2)))
+	// Output: true
+}
+
+func ExampleFlt_CloseTo() {
+	printExample(a.Float(10.0).CloseTo(10.1, 0.2))
+	// Output: true
+}
+
+func ExampleFlt_IsNaN() {
+	printExample(a.Float(math.NaN()).IsNaN())
+	// Output: true
+}
+
+func ExampleFlt_IsInf() {
+	printExample(a.Float(math.Inf(1)).IsInf())
+	// Output: true
+}
+
+func ExampleFlt_IsInfSign() {
+	printExample(a.Float(math.Inf(-1)).IsInfSign(-1))
 	// Output: true
 }

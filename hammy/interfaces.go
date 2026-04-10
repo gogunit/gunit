@@ -8,6 +8,10 @@ type Numeric interface {
 		~float32 | ~float64
 }
 
+type Floaty interface {
+	~float32 | ~float64
+}
+
 type Stringy interface {
 	~string
 }

@@ -2,6 +2,7 @@ package hammy
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -208,6 +209,36 @@ func EqualIgnoringWhitespace(expected string) Matcher[string] {
 
 func EqualNormalizedWhitespace(expected string) Matcher[string] {
 	return EqualIgnoringWhitespace(expected)
+}
+
+func SamePointer[T any](expected *T) Matcher[*T] {
+	return MatchFunc(func(actual *T) AssertionMessage {
+		return Assert(actual == expected, "got pointer <%p>, wanted same pointer as <%p>", actual, expected)
+	})
+}
+
+func TypeOf[T any]() Matcher[any] {
+	expectedType := reflect.TypeOf((*T)(nil)).Elem()
+	return MatchFunc(func(actual any) AssertionMessage {
+		if actual == nil {
+			return Assert(false, "got <nil>, wanted dynamic type <%s>", expectedType)
+		}
+
+		actualType := reflect.TypeOf(actual)
+		return Assert(actualType == expectedType, "got dynamic type <%s>, wanted <%s>", actualType, expectedType)
+	})
+}
+
+func AssignableTo[T any]() Matcher[any] {
+	expectedType := reflect.TypeOf((*T)(nil)).Elem()
+	return MatchFunc(func(actual any) AssertionMessage {
+		if actual == nil {
+			return Assert(false, "got <nil>, wanted assignable to <%s>", expectedType)
+		}
+
+		actualType := reflect.TypeOf(actual)
+		return Assert(actualType.AssignableTo(expectedType), "got dynamic type <%s>, wanted assignable to <%s>", actualType, expectedType)
+	})
 }
 
 func Having[T, U any](selector func(T) U, matcher Matcher[U]) Matcher[T] {

@@ -50,9 +50,12 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 
 ## Number
 
+* [x] CloseTo (via `Float`)
 * [x] EqualTo
 * [x] GreaterThan
 * [x] GreaterOrEqual
+* [x] IsInf (via `Float`)
+* [x] IsNaN (via `Float`)
 * [x] IsZero
 * [x] LessThan
 * [x] LessOrEqual
