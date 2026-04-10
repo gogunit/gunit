@@ -12,6 +12,10 @@ type Stringy interface {
 	~string
 }
 
+type Matcher[T any] interface {
+	Match(actual T) AssertionMessage
+}
+
 func Assert(isSuccessful bool, str string, args ...any) AssertionMessage {
 	return AssertionMessage{
 		IsSuccessful: isSuccessful,

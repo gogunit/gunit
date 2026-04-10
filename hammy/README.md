@@ -21,6 +21,20 @@ func Test_calculator(t *testing.T) {
 }
 ```
 
+## Generic Matcher Core
+
+```go
+func Test_add_returns_small_positive_sum(t *testing.T) {
+	assert := a.New(t)
+	actual := Add(2, 3)
+
+	assert.Is(a.Match(actual, a.AllOf(
+		a.GreaterThan(0),
+		a.LessThan(10),
+	)))
+}
+```
+
 ## Map
 
 * [x] EqualTo
