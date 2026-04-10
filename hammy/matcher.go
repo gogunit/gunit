@@ -2,6 +2,7 @@ package hammy
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
@@ -167,6 +168,46 @@ func NotEmptyString() Matcher[string] {
 	return MatchFunc(func(actual string) AssertionMessage {
 		return Assert(actual != "", "got an empty string, wanted non-empty string")
 	})
+}
+
+func EqualIgnoringCase(expected string) Matcher[string] {
+	return MatchFunc(func(actual string) AssertionMessage {
+		return Assert(strings.EqualFold(actual, expected), "got <%s>, wanted equal to <%s> ignoring case", actual, expected)
+	})
+}
+
+func HasPrefixIgnoringCase(expected string) Matcher[string] {
+	return MatchFunc(func(actual string) AssertionMessage {
+		return Assert(strings.HasPrefix(strings.ToLower(actual), strings.ToLower(expected)), "got <%s>, wanted prefix <%s> ignoring case", actual, expected)
+	})
+}
+
+func HasSuffixIgnoringCase(expected string) Matcher[string] {
+	return MatchFunc(func(actual string) AssertionMessage {
+		return Assert(strings.HasSuffix(strings.ToLower(actual), strings.ToLower(expected)), "got <%s>, wanted suffix <%s> ignoring case", actual, expected)
+	})
+}
+
+func MatchesRegexp(pattern string) Matcher[string] {
+	return MatchFunc(func(actual string) AssertionMessage {
+		re, err := regexp.Compile(pattern)
+		if err != nil {
+			return Assert(false, "invalid regexp <%s>: %v", pattern, err)
+		}
+		return Assert(re.MatchString(actual), "got <%s>, wanted regexp <%s>", actual, pattern)
+	})
+}
+
+func EqualIgnoringWhitespace(expected string) Matcher[string] {
+	return MatchFunc(func(actual string) AssertionMessage {
+		actualNormalized := strings.Join(strings.Fields(actual), " ")
+		expectedNormalized := strings.Join(strings.Fields(expected), " ")
+		return Assert(actualNormalized == expectedNormalized, "got <%s>, wanted equal to <%s> ignoring whitespace", actual, expected)
+	})
+}
+
+func EqualNormalizedWhitespace(expected string) Matcher[string] {
+	return EqualIgnoringWhitespace(expected)
 }
 
 func Having[T, U any](selector func(T) U, matcher Matcher[U]) Matcher[T] {

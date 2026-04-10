@@ -43,3 +43,27 @@ func (s *Str[S]) ToLowerEqualTo(expected string) AssertionMessage {
 	lowerExpected := strings.ToLower(expected)
 	return Assert(lowerActual == lowerExpected, "got <%s>, wanted equal to <%s>", lowerActual, lowerExpected)
 }
+
+func (s *Str[S]) MatchesRegexp(pattern string) AssertionMessage {
+	return MatchesRegexp(pattern).Match(string(s.actual))
+}
+
+func (s *Str[S]) EqualIgnoringCase(expected string) AssertionMessage {
+	return EqualIgnoringCase(expected).Match(string(s.actual))
+}
+
+func (s *Str[S]) HasPrefixIgnoringCase(expected string) AssertionMessage {
+	return HasPrefixIgnoringCase(expected).Match(string(s.actual))
+}
+
+func (s *Str[S]) HasSuffixIgnoringCase(expected string) AssertionMessage {
+	return HasSuffixIgnoringCase(expected).Match(string(s.actual))
+}
+
+func (s *Str[S]) EqualIgnoringWhitespace(expected string) AssertionMessage {
+	return EqualIgnoringWhitespace(expected).Match(string(s.actual))
+}
+
+func (s *Str[S]) EqualNormalizedWhitespace(expected string) AssertionMessage {
+	return EqualNormalizedWhitespace(expected).Match(string(s.actual))
+}

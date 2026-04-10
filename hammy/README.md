@@ -71,11 +71,16 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 ## String
 
 * [x] EqualTo
-* [x] ToLowerEqualTo
 * [x] Contains
+* [x] EqualIgnoringCase
+* [x] EqualIgnoringWhitespace
 * [x] HasPrefix
+* [x] HasPrefixIgnoringCase
 * [x] HasSuffix
+* [x] HasSuffixIgnoringCase
 * [x] IsEmpty
+* [x] MatchesRegexp
+* [x] ToLowerEqualTo
 
 ## Struct
 

@@ -172,6 +172,36 @@ func ExampleNotEmptyString() {
 	// Output: true
 }
 
+func ExampleEqualIgnoringCase() {
+	printExample(a.Match("HeLLo", a.EqualIgnoringCase("hello")))
+	// Output: true
+}
+
+func ExampleHasPrefixIgnoringCase() {
+	printExample(a.Match("Hello world", a.HasPrefixIgnoringCase("heL")))
+	// Output: true
+}
+
+func ExampleHasSuffixIgnoringCase() {
+	printExample(a.Match("Hello world", a.HasSuffixIgnoringCase("WOrLD")))
+	// Output: true
+}
+
+func ExampleMatchesRegexp() {
+	printExample(a.Match("hello-42", a.MatchesRegexp(`^hello-\d+$`)))
+	// Output: true
+}
+
+func ExampleEqualIgnoringWhitespace() {
+	printExample(a.Match(" hello\tworld \n", a.EqualIgnoringWhitespace("hello world")))
+	// Output: true
+}
+
+func ExampleEqualNormalizedWhitespace() {
+	printExample(a.Match(" hello\tworld \n", a.EqualNormalizedWhitespace("hello world")))
+	// Output: true
+}
+
 func ExampleNum_EqualTo() {
 	printExample(a.Number(42).EqualTo(42))
 	// Output: true
@@ -249,6 +279,36 @@ func ExampleStr_NotEmpty() {
 
 func ExampleStr_ToLowerEqualTo() {
 	printExample(a.String("HeLLo").ToLowerEqualTo("hello"))
+	// Output: true
+}
+
+func ExampleStr_MatchesRegexp() {
+	printExample(a.String("hello-42").MatchesRegexp(`^hello-\d+$`))
+	// Output: true
+}
+
+func ExampleStr_EqualIgnoringCase() {
+	printExample(a.String("HeLLo").EqualIgnoringCase("hello"))
+	// Output: true
+}
+
+func ExampleStr_HasPrefixIgnoringCase() {
+	printExample(a.String("Hello world").HasPrefixIgnoringCase("heL"))
+	// Output: true
+}
+
+func ExampleStr_HasSuffixIgnoringCase() {
+	printExample(a.String("Hello world").HasSuffixIgnoringCase("WOrLD"))
+	// Output: true
+}
+
+func ExampleStr_EqualIgnoringWhitespace() {
+	printExample(a.String(" hello\tworld \n").EqualIgnoringWhitespace("hello world"))
+	// Output: true
+}
+
+func ExampleStr_EqualNormalizedWhitespace() {
+	printExample(a.String(" hello\tworld \n").EqualNormalizedWhitespace("hello world"))
 	// Output: true
 }
 

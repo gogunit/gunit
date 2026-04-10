@@ -102,3 +102,35 @@ func Test_string_NotEmpty_failure(t *testing.T) {
 	assert.Is(a.String("").NotEmpty())
 	aSpy.HadErrorContaining(t, "got an empty string, wanted non-empty string")
 }
+
+func Test_string_MatchesRegexp_success(t *testing.T) {
+	assert := a.New(t)
+	assert.Is(a.String("hello-42").MatchesRegexp(`^hello-\d+$`))
+}
+
+func Test_string_MatchesRegexp_invalid_pattern_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := a.New(aSpy)
+	assert.Is(a.String("hello").MatchesRegexp(`[`))
+	aSpy.HadErrorContaining(t, "invalid regexp <[>")
+}
+
+func Test_string_EqualIgnoringCase_success(t *testing.T) {
+	assert := a.New(t)
+	assert.Is(a.String("HeLLo").EqualIgnoringCase("hello"))
+}
+
+func Test_string_HasPrefixIgnoringCase_success(t *testing.T) {
+	assert := a.New(t)
+	assert.Is(a.String("Hello world").HasPrefixIgnoringCase("heL"))
+}
+
+func Test_string_HasSuffixIgnoringCase_success(t *testing.T) {
+	assert := a.New(t)
+	assert.Is(a.String("Hello world").HasSuffixIgnoringCase("WOrLD"))
+}
+
+func Test_string_EqualIgnoringWhitespace_success(t *testing.T) {
+	assert := a.New(t)
+	assert.Is(a.String(" hello\tworld \n").EqualIgnoringWhitespace("hello world"))
+}
