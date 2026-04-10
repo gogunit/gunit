@@ -80,6 +80,8 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 ## Struct
 
 * [x] EqualTo
+* [x] Having
+* [x] HavingField
 
 ## Writing a Custom Matcher
 

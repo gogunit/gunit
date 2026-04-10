@@ -12,6 +12,10 @@ type examplePerson struct {
 	Age  int
 }
 
+type exampleWrapper struct {
+	Person examplePerson
+}
+
 type exampleError struct{}
 
 func (exampleError) Error() string {
@@ -385,6 +389,22 @@ func ExampleHasKeyMatching() {
 
 func ExampleHasValueMatching() {
 	printExample(a.Match(map[string]int{"alpha": 3}, a.HasValueMatching[string, int](a.GreaterThan(2))))
+	// Output: true
+}
+
+func ExampleHaving() {
+	person := examplePerson{Name: "Ada", Age: 37}
+	printExample(a.Match(person, a.Having(func(actual examplePerson) int {
+		return actual.Age
+	}, a.GreaterThan(30))))
+	// Output: true
+}
+
+func ExampleHavingField() {
+	person := examplePerson{Name: "Ada", Age: 37}
+	printExample(a.Match(person, a.HavingField("Name", func(actual examplePerson) string {
+		return actual.Name
+	}, a.EqualTo("Ada"))))
 	// Output: true
 }
 

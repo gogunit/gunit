@@ -169,6 +169,23 @@ func NotEmptyString() Matcher[string] {
 	})
 }
 
+func Having[T, U any](selector func(T) U, matcher Matcher[U]) Matcher[T] {
+	return HavingField("", selector, matcher)
+}
+
+func HavingField[T, U any](name string, selector func(T) U, matcher Matcher[U]) Matcher[T] {
+	return MatchFunc(func(actual T) AssertionMessage {
+		result := matcher.Match(selector(actual))
+		if result.IsSuccessful {
+			return result
+		}
+		if name == "" {
+			return Assert(false, "selected value: %s", result.Message)
+		}
+		return Assert(false, "field %s: %s", name, result.Message)
+	})
+}
+
 func formatMatcherFailure(prefix string, result AssertionMessage) string {
 	if result.Message == "" {
 		return prefix

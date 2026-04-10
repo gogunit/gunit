@@ -65,3 +65,15 @@ func Test_run_wraps_timeout_error(t *testing.T) {
 	assert.Is(a.ErrorIs(err, errTimeout))
 }
 ```
+
+```go
+func Test_people_are_sorted_by_name(t *testing.T) {
+	assert := a.New(t)
+	people := []Person{{Name: "Ada"}, {Name: "Linus"}}
+
+	assert.Is(a.Match(people, a.ContainsInOrder(
+		a.HavingField("Name", func(person Person) string { return person.Name }, a.EqualTo("Ada")),
+		a.HavingField("Name", func(person Person) string { return person.Name }, a.EqualTo("Linus")),
+	)))
+}
+```
