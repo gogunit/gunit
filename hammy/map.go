@@ -14,6 +14,10 @@ type Mappy[K comparable, V any] struct {
 	actual map[K]V
 }
 
+func (m Mappy[K, V]) Matches(matcher Matcher[map[K]V]) AssertionMessage {
+	return matcher.Match(m.actual)
+}
+
 func (m Mappy[K, V]) WithKeys(expected ...K) AssertionMessage {
 	var found []K
 	var missing []K

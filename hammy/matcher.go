@@ -35,6 +35,17 @@ func MatchFunc[T any](fn func(actual T) AssertionMessage) Matcher[T] {
 //
 //	assert := hammy.New(t)
 //	assert.Is(hammy.Match(value, hammy.EqualTo(expected)))
+//
+// Prefer the typed wrappers for direct assertions and composed matcher checks
+// on known domains:
+//
+//	assert.Is(hammy.Number(actual).Matches(hammy.AllOf(
+//		hammy.GreaterThan(0),
+//		hammy.LessThan(10),
+//	)))
+//
+// Match remains useful when no dedicated wrapper exists or when the actual
+// value is intentionally held as any.
 func Match[T any](actual T, matcher Matcher[T]) AssertionMessage {
 	return matcher.Match(actual)
 }

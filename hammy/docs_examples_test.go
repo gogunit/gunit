@@ -114,21 +114,21 @@ func ExampleMatchFunc() {
 	matcher := a.MatchFunc(func(actual int) a.AssertionMessage {
 		return a.Assert(actual%2 == 0, "got <%d>, wanted an even number", actual)
 	})
-	printExample(a.Match(4, matcher))
+	printExample(a.Number(4).Matches(matcher))
 	// Output:
 	// message="got <4>, wanted an even number"
 	// success=true
 }
 
 func ExampleNot() {
-	printExample(a.Match("hello", a.Not(a.Contains("bye"))))
+	printExample(a.String("hello").Matches(a.Not(a.Contains("bye"))))
 	// Output:
 	// message="not(got <hello>, wanted substring <bye>)"
 	// success=true
 }
 
 func ExampleAllOf() {
-	printExample(a.Match(5, a.AllOf(
+	printExample(a.Number(5).Matches(a.AllOf(
 		a.GreaterThan(0),
 		a.LessThan(10),
 	)))
@@ -138,7 +138,7 @@ func ExampleAllOf() {
 }
 
 func ExampleAnyOf() {
-	printExample(a.Match(10, a.AnyOf(
+	printExample(a.Number(10).Matches(a.AnyOf(
 		a.EqualTo(7),
 		a.EqualTo(10),
 	)))
@@ -148,161 +148,165 @@ func ExampleAnyOf() {
 }
 
 func ExampleDescribe() {
-	printExample(a.Match(2, a.Describe("age check", a.GreaterThan(18))))
+	printExample(a.Number(2).Matches(a.Describe("age check", a.GreaterThan(18))))
 	// Output:
 	// message="age check: got <2>, wanted greater than <18>"
 	// success=false
 }
 
 func ExampleEqualTo() {
-	printExample(a.Match("hello", a.EqualTo("hello")))
+	printExample(a.String("hello").Matches(a.EqualTo("hello")))
 	// Output:
 	// message="got <hello>, wanted equal to <hello>"
 	// success=true
 }
 
 func ExampleGreaterThan() {
-	printExample(a.Match(5, a.GreaterThan(3)))
+	printExample(a.Number(5).Matches(a.GreaterThan(3)))
 	// Output:
 	// message="got <5>, wanted greater than <3>"
 	// success=true
 }
 
 func ExampleGreaterOrEqual() {
-	printExample(a.Match(5, a.GreaterOrEqual(5)))
+	printExample(a.Number(5).Matches(a.GreaterOrEqual(5)))
 	// Output:
 	// message="got <5>, wanted greater or equal to <5>"
 	// success=true
 }
 
 func ExampleLessThan() {
-	printExample(a.Match(3, a.LessThan(5)))
+	printExample(a.Number(3).Matches(a.LessThan(5)))
 	// Output:
 	// message="got <3>, wanted less than <5>"
 	// success=true
 }
 
 func ExampleLessOrEqual() {
-	printExample(a.Match(5, a.LessOrEqual(5)))
+	printExample(a.Number(5).Matches(a.LessOrEqual(5)))
 	// Output:
 	// message="got <5>, wanted less or equal to <5>"
 	// success=true
 }
 
 func ExampleZero() {
-	printExample(a.Match(0, a.Zero[int]()))
+	var actual int = 0
+	printExample(a.Number(actual).Matches(a.Zero[int]()))
 	// Output:
 	// message="got <0>, wanted equal to zero"
 	// success=true
 }
 
 func ExampleWithin() {
-	printExample(a.Match(10.1, a.Within(10.0, 0.2)))
+	printExample(a.Number(10.1).Matches(a.Within(10.0, 0.2)))
 	// Output:
 	// message="got <10.1>, wanted within <0.2> of <10>"
 	// success=true
 }
 
 func ExampleContains() {
-	printExample(a.Match("hello world", a.Contains("world")))
+	printExample(a.String("hello world").Matches(a.Contains("world")))
 	// Output:
 	// message="got <hello world>, wanted substring <world>"
 	// success=true
 }
 
 func ExampleHasPrefix() {
-	printExample(a.Match("hello world", a.HasPrefix("hello")))
+	printExample(a.String("hello world").Matches(a.HasPrefix("hello")))
 	// Output:
 	// message="got <hello world>, wanted prefix <hello>"
 	// success=true
 }
 
 func ExampleHasSuffix() {
-	printExample(a.Match("hello world", a.HasSuffix("world")))
+	printExample(a.String("hello world").Matches(a.HasSuffix("world")))
 	// Output:
 	// message="got <hello world>, wanted suffix <world>"
 	// success=true
 }
 
 func ExampleEmptyString() {
-	printExample(a.Match("", a.EmptyString()))
+	printExample(a.String("").Matches(a.EmptyString()))
 	// Output:
 	// message="got <>, wanted an empty string"
 	// success=true
 }
 
 func ExampleNotEmptyString() {
-	printExample(a.Match("hello", a.NotEmptyString()))
+	printExample(a.String("hello").Matches(a.NotEmptyString()))
 	// Output:
 	// message="got an empty string, wanted non-empty string"
 	// success=true
 }
 
 func ExampleEqualIgnoringCase() {
-	printExample(a.Match("HeLLo", a.EqualIgnoringCase("hello")))
+	printExample(a.String("HeLLo").Matches(a.EqualIgnoringCase("hello")))
 	// Output:
 	// message="got <HeLLo>, wanted equal to <hello> ignoring case"
 	// success=true
 }
 
 func ExampleHasPrefixIgnoringCase() {
-	printExample(a.Match("Hello world", a.HasPrefixIgnoringCase("heL")))
+	printExample(a.String("Hello world").Matches(a.HasPrefixIgnoringCase("heL")))
 	// Output:
 	// message="got <Hello world>, wanted prefix <heL> ignoring case"
 	// success=true
 }
 
 func ExampleHasSuffixIgnoringCase() {
-	printExample(a.Match("Hello world", a.HasSuffixIgnoringCase("WOrLD")))
+	printExample(a.String("Hello world").Matches(a.HasSuffixIgnoringCase("WOrLD")))
 	// Output:
 	// message="got <Hello world>, wanted suffix <WOrLD> ignoring case"
 	// success=true
 }
 
 func ExampleMatchesRegexp() {
-	printExample(a.Match("hello-42", a.MatchesRegexp(`^hello-\d+$`)))
+	printExample(a.String("hello-42").Matches(a.MatchesRegexp(`^hello-\d+$`)))
 	// Output:
 	// message="got <hello-42>, wanted regexp <^hello-\\d+$>"
 	// success=true
 }
 
 func ExampleEqualIgnoringWhitespace() {
-	printExample(a.Match(" hello\tworld \n", a.EqualIgnoringWhitespace("hello world")))
+	printExample(a.String(" hello\tworld \n").Matches(a.EqualIgnoringWhitespace("hello world")))
 	// Output:
 	// message="got < hello\tworld \n>, wanted equal to <hello world> ignoring whitespace"
 	// success=true
 }
 
 func ExampleEqualNormalizedWhitespace() {
-	printExample(a.Match(" hello\tworld \n", a.EqualNormalizedWhitespace("hello world")))
+	printExample(a.String(" hello\tworld \n").Matches(a.EqualNormalizedWhitespace("hello world")))
 	// Output:
 	// message="got < hello\tworld \n>, wanted equal to <hello world> ignoring whitespace"
 	// success=true
 }
 
 func ExampleCloseTo() {
-	printExample(a.Match(10.0, a.CloseTo(10.1, 0.2)))
+	printExample(a.Float(10.0).Matches(a.CloseTo(10.1, 0.2)))
 	// Output:
 	// message="got <10>, wanted within <0.2> of <10.1>"
 	// success=true
 }
 
 func ExampleIsNaN() {
-	printExample(a.Match(math.NaN(), a.IsNaN[float64]()))
+	actual := math.NaN()
+	printExample(a.Float(actual).Matches(a.IsNaN[float64]()))
 	// Output:
 	// message="got <NaN>, wanted NaN"
 	// success=true
 }
 
 func ExampleIsInf() {
-	printExample(a.Match(math.Inf(1), a.IsInf[float64]()))
+	actual := math.Inf(1)
+	printExample(a.Float(actual).Matches(a.IsInf[float64]()))
 	// Output:
 	// message="got <+Inf>, wanted infinity"
 	// success=true
 }
 
 func ExampleIsInfSign() {
-	printExample(a.Match(math.Inf(-1), a.IsInfSign[float64](-1)))
+	actual := math.Inf(-1)
+	printExample(a.Float(actual).Matches(a.IsInfSign[float64](-1)))
 	// Output:
 	// message="got <-Inf>, wanted infinity with sign <-1>"
 	// success=true
@@ -385,6 +389,16 @@ func ExampleNum_Within() {
 	printExample(a.Number(10.0).Within(10.1, 0.2))
 	// Output:
 	// message="want <10> greater or equal to <10.1>"
+	// success=true
+}
+
+func ExampleNum_Matches() {
+	printExample(a.Number(5).Matches(a.AllOf(
+		a.GreaterThan(0),
+		a.LessThan(10),
+	)))
+	// Output:
+	// message="matched all 2 matchers"
 	// success=true
 }
 
@@ -486,6 +500,13 @@ func ExampleStr_EqualNormalizedWhitespace() {
 	// success=true
 }
 
+func ExampleStr_Matches() {
+	printExample(a.String("hello").Matches(a.EqualIgnoringCase("HELLO")))
+	// Output:
+	// message="got <hello>, wanted equal to <HELLO> ignoring case"
+	// success=true
+}
+
 func ExampleSlc_Contains() {
 	printExample(a.Slice([]int{1, 2, 3}).Contains(2, 3))
 	// Output:
@@ -532,6 +553,16 @@ func ExampleSlc_ContainsExactly() {
 	printExample(a.Slice([]int{3, 2, 1}).ContainsExactly(1, 2, 3))
 	// Output:
 	// message="got 0 unmatched items, wanted array containing the 3 items. Items at index  were missing"
+	// success=true
+}
+
+func ExampleSlc_Matches() {
+	printExample(a.Slice([]int{2, 1}).Matches(a.ContainsInAnyOrder(
+		a.EqualTo(1),
+		a.EqualTo(2),
+	)))
+	// Output:
+	// message="all 2 items matched in any order"
 	// success=true
 }
 
@@ -619,22 +650,32 @@ func ExampleMappy_EqualTo() {
 	// success=true
 }
 
+func ExampleMappy_Matches() {
+	printExample(a.Map(map[string]int{"alpha": 1, "beta": 2}).Matches(a.HasEntry(
+		a.EqualTo("beta"),
+		a.GreaterThan(1),
+	)))
+	// Output:
+	// message="found matching entry for key <beta>"
+	// success=true
+}
+
 func ExampleEvery() {
-	printExample(a.Match([]int{2, 4, 6}, a.Every(a.GreaterThan(1))))
+	printExample(a.Slice([]int{2, 4, 6}).Matches(a.Every(a.GreaterThan(1))))
 	// Output:
 	// message="all 3 items matched"
 	// success=true
 }
 
 func ExampleHasItem() {
-	printExample(a.Match([]string{"alpha", "beta"}, a.HasItem(a.HasPrefix("bet"))))
+	printExample(a.Slice([]string{"alpha", "beta"}).Matches(a.HasItem(a.HasPrefix("bet"))))
 	// Output:
 	// message="found matching item at index 1"
 	// success=true
 }
 
 func ExampleContainsInOrder() {
-	printExample(a.Match([]string{"alpha", "beta"}, a.ContainsInOrder(
+	printExample(a.Slice([]string{"alpha", "beta"}).Matches(a.ContainsInOrder(
 		a.EqualTo("alpha"),
 		a.HasSuffix("ta"),
 	)))
@@ -644,7 +685,7 @@ func ExampleContainsInOrder() {
 }
 
 func ExampleContainsInAnyOrder() {
-	printExample(a.Match([]int{2, 1, 2}, a.ContainsInAnyOrder(
+	printExample(a.Slice([]int{2, 1, 2}).Matches(a.ContainsInAnyOrder(
 		a.EqualTo(2),
 		a.EqualTo(2),
 		a.EqualTo(1),
@@ -655,7 +696,7 @@ func ExampleContainsInAnyOrder() {
 }
 
 func ExampleHasEntry() {
-	printExample(a.Match(map[string]int{"alpha": 1, "beta": 2}, a.HasEntry(
+	printExample(a.Map(map[string]int{"alpha": 1, "beta": 2}).Matches(a.HasEntry(
 		a.EqualTo("beta"),
 		a.GreaterThan(1),
 	)))
@@ -665,14 +706,14 @@ func ExampleHasEntry() {
 }
 
 func ExampleHasKeyMatching() {
-	printExample(a.Match(map[string]int{"alpha": 1}, a.HasKeyMatching[string, int](a.HasSuffix("pha"))))
+	printExample(a.Map(map[string]int{"alpha": 1}).Matches(a.HasKeyMatching[string, int](a.HasSuffix("pha"))))
 	// Output:
 	// message="found matching key <alpha>"
 	// success=true
 }
 
 func ExampleHasValueMatching() {
-	printExample(a.Match(map[string]int{"alpha": 3}, a.HasValueMatching[string, int](a.GreaterThan(2))))
+	printExample(a.Map(map[string]int{"alpha": 3}).Matches(a.HasValueMatching[string, int](a.GreaterThan(2))))
 	// Output:
 	// message="found matching value for key <alpha>"
 	// success=true
@@ -680,7 +721,7 @@ func ExampleHasValueMatching() {
 
 func ExampleHaving() {
 	person := examplePerson{Name: "Ada", Age: 37}
-	printExample(a.Match(person, a.Having(func(actual examplePerson) int {
+	printExample(a.Struct(person).Matches(a.Having(func(actual examplePerson) int {
 		return actual.Age
 	}, a.GreaterThan(30))))
 	// Output:
@@ -690,11 +731,11 @@ func ExampleHaving() {
 
 func ExampleHavingField() {
 	person := examplePerson{Name: "Ada", Age: 37}
-	printExample(a.Match(person, a.HavingField("Name", func(actual examplePerson) string {
+	printExample(a.Struct(person).Matches(a.HavingField("Name", func(actual examplePerson) string {
 		return actual.Name
-	}, a.EqualTo("Ada"))))
+	}, a.EqualIgnoringCase("ada"))))
 	// Output:
-	// message="got <Ada>, wanted equal to <Ada>"
+	// message="got <Ada>, wanted equal to <ada> ignoring case"
 	// success=true
 }
 
@@ -702,6 +743,15 @@ func ExampleSt_EqualTo() {
 	printExample(a.Struct(examplePerson{Name: "Ada", Age: 37}).EqualTo(examplePerson{Name: "Ada", Age: 37}))
 	// Output:
 	// message="Structs are not equal (+got -want):\n"
+	// success=true
+}
+
+func ExampleSt_Matches() {
+	printExample(a.Struct(examplePerson{Name: "Ada", Age: 37}).Matches(a.HavingField("Age", func(actual examplePerson) int {
+		return actual.Age
+	}, a.GreaterThan(30))))
+	// Output:
+	// message="got <37>, wanted greater than <30>"
 	// success=true
 }
 
@@ -789,5 +839,12 @@ func ExampleFlt_IsInfSign() {
 	printExample(a.Float(math.Inf(-1)).IsInfSign(-1))
 	// Output:
 	// message="got <-Inf>, wanted infinity with sign <-1>"
+	// success=true
+}
+
+func ExampleFlt_Matches() {
+	printExample(a.Float(10.0).Matches(a.CloseTo(10.1, 0.2)))
+	// Output:
+	// message="got <10>, wanted within <0.2> of <10.1>"
 	// success=true
 }

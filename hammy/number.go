@@ -12,6 +12,10 @@ type Num[N Numeric] struct {
 	actual N
 }
 
+func (n *Num[N]) Matches(matcher Matcher[N]) AssertionMessage {
+	return matcher.Match(n.actual)
+}
+
 func (n *Num[N]) EqualTo(expected N) AssertionMessage {
 	return Assert(n.actual == expected, "want <%v> equal to <%v>", n.actual, expected)
 }

@@ -10,6 +10,10 @@ type Str[S Stringy] struct {
 	actual S
 }
 
+func (s *Str[S]) Matches(matcher Matcher[string]) AssertionMessage {
+	return matcher.Match(string(s.actual))
+}
+
 func (s *Str[S]) EqualTo(expected S) AssertionMessage {
 	return Assert(s.actual == expected, "got <%s>, wanted equal to <%s>", s.actual, expected)
 }

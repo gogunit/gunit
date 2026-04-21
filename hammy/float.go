@@ -10,6 +10,10 @@ type Flt[F Floaty] struct {
 	actual F
 }
 
+func (f *Flt[F]) Matches(matcher Matcher[F]) AssertionMessage {
+	return matcher.Match(f.actual)
+}
+
 func (f *Flt[F]) CloseTo(expected, delta F) AssertionMessage {
 	return CloseTo(expected, delta).Match(f.actual)
 }

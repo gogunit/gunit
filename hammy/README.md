@@ -28,12 +28,14 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 	assert := a.New(t)
 	actual := Add(2, 3)
 
-	assert.Is(a.Match(actual, a.AllOf(
+	assert.Is(a.Number(actual).Matches(a.AllOf(
 		a.GreaterThan(0),
 		a.LessThan(10),
 	)))
 }
 ```
+
+Prefer `Number`, `String`, `Slice`, `Map`, `Struct`, and `Float` for direct assertions and composed matcher checks. Use `Match` when no typed wrapper fits or the value is intentionally held as `any`.
 
 ## Map
 

@@ -10,6 +10,10 @@ type St[S any] struct {
 	actual S
 }
 
+func (s *St[S]) Matches(matcher Matcher[S]) AssertionMessage {
+	return matcher.Match(s.actual)
+}
+
 func (s *St[S]) EqualTo(expected S) AssertionMessage {
 	diff := cmp.Diff(expected, s.actual)
 	return Assert(diff == "", "Structs are not equal (+got -want):\n%s", diff)

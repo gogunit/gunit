@@ -15,6 +15,10 @@ type Slc[I any] struct {
 	actual []I
 }
 
+func (a *Slc[I]) Matches(matcher Matcher[[]I]) AssertionMessage {
+	return matcher.Match(a.actual)
+}
+
 // Contains asserts whether the slice contains the expected elements in any order.
 func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 	hasMatch := make([]bool, len(expected))
