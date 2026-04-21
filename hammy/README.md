@@ -11,6 +11,8 @@ The aim is to provide terse compile-time oriented type checking.
 package adder
 
 import (
+	"testing"
+
 	a "github.com/gogunit/gunit/hammy"
 )
 
@@ -21,7 +23,9 @@ func Test_calculator(t *testing.T) {
 }
 ```
 
-## Generic Matcher Core
+## Preferred Style
+
+Prefer `Number`, `String`, `Slice`, `Map`, `Struct`, and `Float` for direct assertions and composed matcher checks:
 
 ```go
 func Test_add_returns_small_positive_sum(t *testing.T) {
@@ -35,7 +39,18 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 }
 ```
 
-Prefer `Number`, `String`, `Slice`, `Map`, `Struct`, and `Float` for direct assertions and composed matcher checks. Use `Match` when no typed wrapper fits or the value is intentionally held as `any`.
+Use `Match` when no typed wrapper fits or when the value is intentionally held as `any`.
+
+## Generic Matcher Core
+
+```go
+func Test_payload_has_expected_type(t *testing.T) {
+	assert := a.New(t)
+	var payload any = Response{Status: "ok"}
+
+	assert.Is(a.Match(payload, a.TypeOf[Response]()))
+}
+```
 
 ## Map
 

@@ -8,6 +8,29 @@
 
 gounit is test assertions library for Go. It was developed to address the shortcoming of many assertion frameworks that employ assertion of types at runtime rather than compile time.
 
+## Install
+
+```bash
+go get github.com/gogunit/gunit
+```
+
+## Choosing An API
+
+Use `gunit` when you want direct typed assertions on `testing.T`.
+
+Use `hammy` when you want matcher-style assertions, especially when composing checks with `AllOf`, `AnyOf`, `HavingField`, `ContainsInOrder`, and related helpers.
+
+Within `hammy`, prefer the typed wrappers for most assertions:
+
+```go
+assert.Is(a.Number(actual).Matches(a.AllOf(
+	a.GreaterThan(0),
+	a.LessThan(10),
+)))
+```
+
+Use `a.Match(...)` when no dedicated wrapper fits or when the value is intentionally held as `any`.
+
 ## Examples
 
 ```go
@@ -47,6 +70,18 @@ func Test_add_returns_expected_sum(t *testing.T) {
 ```
 
 ```go
+func Test_add_returns_small_positive_sum(t *testing.T) {
+	assert := a.New(t)
+	actual := Add(2, 3)
+
+	assert.Is(a.Number(actual).Matches(a.AllOf(
+		a.GreaterThan(0),
+		a.LessThan(10),
+	)))
+}
+```
+
+```go
 package service
 
 import (
@@ -77,3 +112,14 @@ func Test_people_are_sorted_by_name(t *testing.T) {
 	))
 }
 ```
+
+```go
+func Test_dynamic_payload_has_expected_type(t *testing.T) {
+	assert := a.New(t)
+	var payload any = Response{Status: "ok"}
+
+	assert.Is(a.Match(payload, a.TypeOf[Response]()))
+}
+```
+
+For more Hammy examples and the matcher reference, see [hammy/README.md](hammy/README.md).
