@@ -31,11 +31,31 @@ func ExampleEqual_reorderedObjectKeys() {
 	// success=true
 }
 
+func ExampleEqualWithOptions() {
+	actual := `{"status":"ok","meta":{"request_id":"abc"}}`
+	expected := `{"status":"ok","meta":{"request_id":"xyz"}}`
+
+	printExample(jsonassert.EqualWithOptions(actual, expected, jsonassert.IgnorePaths("meta.request_id")))
+	// Output:
+	// message="JSON mismatch (-want +got):\n"
+	// success=true
+}
+
 func ExampleEqualBytes() {
 	actual := []byte(`{"one":1}`)
 	expected := []byte(`{"one":1.0}`)
 
 	printExample(jsonassert.EqualBytes(actual, expected))
+	// Output:
+	// message="JSON mismatch (-want +got):\n"
+	// success=true
+}
+
+func ExampleEqualBytesWithOptions() {
+	actual := []byte(`{"tags":["go","test"]}`)
+	expected := []byte(`{"tags":["test","go"]}`)
+
+	printExample(jsonassert.EqualBytesWithOptions(actual, expected, jsonassert.UnorderedArraysAt("tags")))
 	// Output:
 	// message="JSON mismatch (-want +got):\n"
 	// success=true
@@ -139,6 +159,26 @@ func ExampleArrayContainsBytes() {
 	printExample(jsonassert.ArrayContainsBytes(actual, "items", expected))
 	// Output:
 	// message="found matching element at JSON path <items> index <1>"
+	// success=true
+}
+
+func ExampleIgnorePaths() {
+	actual := `{"status":"ok","meta":{"request_id":"abc"}}`
+	expected := `{"status":"ok","meta":{"request_id":"xyz"}}`
+
+	printExample(jsonassert.EqualWithOptions(actual, expected, jsonassert.IgnorePaths("meta.request_id")))
+	// Output:
+	// message="JSON mismatch (-want +got):\n"
+	// success=true
+}
+
+func ExampleUnorderedArraysAt() {
+	actual := `{"tags":["go","test","json"]}`
+	expected := `{"tags":["json","go","test"]}`
+
+	printExample(jsonassert.EqualWithOptions(actual, expected, jsonassert.UnorderedArraysAt("tags")))
+	// Output:
+	// message="JSON mismatch (-want +got):\n"
 	// success=true
 }
 

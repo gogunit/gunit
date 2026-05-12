@@ -18,6 +18,10 @@ func Equal(actual, expected string) hammy.AssertionMessage {
 	return EqualBytes([]byte(actual), []byte(expected))
 }
 
+func EqualWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
+	return EqualBytesWithOptions([]byte(actual), []byte(expected), opts...)
+}
+
 func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
 	actualBytes, result := readJSON("actual", actual)
 	if !result.IsSuccessful {
@@ -33,6 +37,10 @@ func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
 }
 
 func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
+	return EqualBytesWithOptions(actual, expected)
+}
+
+func EqualBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
@@ -43,8 +51,32 @@ func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
 		return hammy.Assert(false, "expected JSON invalid: %v", err)
 	}
 
+	actualJSON, expectedJSON, err = applyOptions(actualJSON, expectedJSON, opts...)
+	if err != nil {
+		return hammy.Assert(false, "%v", err)
+	}
+
 	diff := cmp.Diff(expectedJSON, actualJSON)
 	return hammy.Assert(diff == "", "JSON mismatch (-want +got):\n%s", diff)
+}
+
+type Option func(*compareOptions)
+
+func IgnorePaths(paths ...string) Option {
+	return func(options *compareOptions) {
+		options.ignorePaths = append(options.ignorePaths, paths...)
+	}
+}
+
+func UnorderedArraysAt(paths ...string) Option {
+	return func(options *compareOptions) {
+		options.unorderedArrayPaths = append(options.unorderedArrayPaths, paths...)
+	}
+}
+
+type compareOptions struct {
+	ignorePaths         []string
+	unorderedArrayPaths []string
 }
 
 func Valid(actual string) hammy.AssertionMessage {
@@ -188,6 +220,115 @@ func readJSON(name string, reader io.Reader) ([]byte, hammy.AssertionMessage) {
 	return data, hammy.Assert(true, "%s JSON read", name)
 }
 
+func applyOptions(actual, expected any, opts ...Option) (any, any, error) {
+	var options compareOptions
+	for _, opt := range opts {
+		opt(&options)
+	}
+
+	for _, path := range options.ignorePaths {
+		steps, err := parsePath(path)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid JSON path <%s>: %w", path, err)
+		}
+		actual = deleteJSONPath(actual, steps)
+		expected = deleteJSONPath(expected, steps)
+	}
+
+	for _, path := range options.unorderedArrayPaths {
+		steps, err := parsePath(path)
+		if err != nil {
+			return nil, nil, fmt.Errorf("invalid JSON path <%s>: %w", path, err)
+		}
+		if err := sortJSONArrayAtPath(actual, steps, path); err != nil {
+			return nil, nil, err
+		}
+		if err := sortJSONArrayAtPath(expected, steps, path); err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return actual, expected, nil
+}
+
+func deleteJSONPath(value any, steps []pathStep) any {
+	if len(steps) == 0 {
+		return nil
+	}
+
+	parent, found := lookupParsedJSONPath(value, steps[:len(steps)-1])
+	if !found {
+		return value
+	}
+
+	last := steps[len(steps)-1]
+	if last.isIndex {
+		items, ok := parent.([]any)
+		if ok && last.index >= 0 && last.index < len(items) {
+			items[last.index] = nil
+		}
+		return value
+	}
+
+	fields, ok := parent.(map[string]any)
+	if ok {
+		delete(fields, last.key)
+	}
+	return value
+}
+
+func sortJSONArrayAtPath(value any, steps []pathStep, path string) error {
+	target, found := lookupParsedJSONPath(value, steps)
+	if !found {
+		return nil
+	}
+
+	items, ok := target.([]any)
+	if !ok {
+		return fmt.Errorf("got JSON path <%s> type <%T>, wanted array", path, target)
+	}
+	sort.SliceStable(items, func(i, j int) bool {
+		return canonicalJSONKey(items[i]) < canonicalJSONKey(items[j])
+	})
+	return nil
+}
+
+func canonicalJSONKey(value any) string {
+	switch typed := value.(type) {
+	case nil:
+		return "null"
+	case bool:
+		if typed {
+			return "bool:true"
+		}
+		return "bool:false"
+	case string:
+		return "string:" + strconv.Quote(typed)
+	case normalizedNumber:
+		return "number:" + typed.Value
+	case []any:
+		parts := make([]string, 0, len(typed))
+		for _, item := range typed {
+			parts = append(parts, canonicalJSONKey(item))
+		}
+		return "array:[" + strings.Join(parts, ",") + "]"
+	case map[string]any:
+		keys := make([]string, 0, len(typed))
+		for key := range typed {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		parts := make([]string, 0, len(keys))
+		for _, key := range keys {
+			parts = append(parts, strconv.Quote(key)+":"+canonicalJSONKey(typed[key]))
+		}
+		return "object:{" + strings.Join(parts, ",") + "}"
+	default:
+		return fmt.Sprintf("%T:%v", typed, typed)
+	}
+}
+
 func containsJSON(actual, expected any, path string) (bool, string) {
 	switch expectedValue := expected.(type) {
 	case map[string]any:
@@ -244,13 +385,17 @@ func lookupJSONPath(value any, path string) (any, bool, error) {
 	if err != nil {
 		return nil, false, err
 	}
+	value, found := lookupParsedJSONPath(value, steps)
+	return value, found, nil
+}
 
+func lookupParsedJSONPath(value any, steps []pathStep) (any, bool) {
 	current := value
 	for _, step := range steps {
 		if step.isIndex {
 			items, ok := current.([]any)
 			if !ok || step.index < 0 || step.index >= len(items) {
-				return nil, false, nil
+				return nil, false
 			}
 			current = items[step.index]
 			continue
@@ -258,15 +403,15 @@ func lookupJSONPath(value any, path string) (any, bool, error) {
 
 		fields, ok := current.(map[string]any)
 		if !ok {
-			return nil, false, nil
+			return nil, false
 		}
 		next, ok := fields[step.key]
 		if !ok {
-			return nil, false, nil
+			return nil, false
 		}
 		current = next
 	}
-	return current, true, nil
+	return current, true
 }
 
 func parsePath(path string) ([]pathStep, error) {

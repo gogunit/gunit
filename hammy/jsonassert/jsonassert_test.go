@@ -242,6 +242,81 @@ func Test_ArrayContainsBytes_success(t *testing.T) {
 	assert.Is(jsonassert.ArrayContainsBytes([]byte(`{"items":[1,2]}`), "items", []byte(`2.0`)))
 }
 
+func Test_EqualWithOptions_success_ignore_paths(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualWithOptions(
+		`{"status":"ok","meta":{"request_id":"abc"}}`,
+		`{"status":"ok","meta":{"request_id":"xyz"}}`,
+		jsonassert.IgnorePaths("meta.request_id"),
+	))
+}
+
+func Test_EqualWithOptions_success_ignore_array_item_path(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualWithOptions(
+		`{"items":[{"id":1,"etag":"a"}]}`,
+		`{"items":[{"id":1,"etag":"b"}]}`,
+		jsonassert.IgnorePaths("items[0].etag"),
+	))
+}
+
+func Test_EqualWithOptions_failure_invalid_ignore_path(t *testing.T) {
+	result := jsonassert.EqualWithOptions(`{"status":"ok"}`, `{"status":"ok"}`, jsonassert.IgnorePaths("meta."))
+
+	requireFailure(t, result, "invalid JSON path <meta.>: path ends with dot")
+}
+
+func Test_EqualWithOptions_success_unordered_array(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualWithOptions(
+		`{"tags":["go","test","json"]}`,
+		`{"tags":["json","go","test"]}`,
+		jsonassert.UnorderedArraysAt("tags"),
+	))
+}
+
+func Test_EqualWithOptions_success_unordered_array_of_objects(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualWithOptions(
+		`{"items":[{"id":2},{"id":1}]}`,
+		`{"items":[{"id":1.0},{"id":2.0}]}`,
+		jsonassert.UnorderedArraysAt("items"),
+	))
+}
+
+func Test_EqualWithOptions_failure_unordered_array_non_array_path(t *testing.T) {
+	result := jsonassert.EqualWithOptions(
+		`{"items":{"id":1}}`,
+		`{"items":{"id":1}}`,
+		jsonassert.UnorderedArraysAt("items"),
+	)
+
+	requireFailure(t, result, "got JSON path <items> type <map[string]interface {}>, wanted array")
+}
+
+func Test_EqualWithOptions_failure_without_ignore_paths(t *testing.T) {
+	result := jsonassert.EqualWithOptions(
+		`{"status":"ok","meta":{"request_id":"abc"}}`,
+		`{"status":"ok","meta":{"request_id":"xyz"}}`,
+	)
+
+	requireFailure(t, result, "JSON mismatch (-want +got):")
+}
+
+func Test_EqualBytesWithOptions_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualBytesWithOptions(
+		[]byte(`{"tags":["go","test"]}`),
+		[]byte(`{"tags":["test","go"]}`),
+		jsonassert.UnorderedArraysAt("tags"),
+	))
+}
+
 func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string) {
 	t.Helper()
 	if result.IsSuccessful {

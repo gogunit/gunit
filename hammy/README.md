@@ -59,6 +59,8 @@ Use `jsonassert` for semantic JSON equality that ignores object key order and in
 import ja "github.com/gogunit/gunit/hammy/jsonassert"
 
 assert.Is(ja.Equal(actualJSON, expectedJSON))
+assert.Is(ja.PathEqual(actualJSON, "user.name", `"Ada"`))
+assert.Is(ja.EqualWithOptions(actualJSON, expectedJSON, ja.IgnorePaths("meta.request_id")))
 ```
 
 ## Generic Matcher Core
@@ -120,8 +122,24 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## JSON (`hammy/jsonassert`)
 
+* [x] ArrayContains
+* [x] ArrayContainsBytes
+* [x] Contains
+* [x] ContainsBytes
 * [x] Equal
 * [x] EqualBytes
+* [x] EqualBytesWithOptions
+* [x] EqualReader
+* [x] EqualWithOptions
+* [x] IgnorePaths
+* [x] PathEqual
+* [x] PathEqualBytes
+* [x] PathExists
+* [x] PathMissing
+* [x] UnorderedArraysAt
+* [x] Valid
+* [x] ValidBytes
+* [x] ValidReader
 
 ## Number
 
