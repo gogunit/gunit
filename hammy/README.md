@@ -41,6 +41,26 @@ func Test_add_returns_small_positive_sum(t *testing.T) {
 
 Use `Match` when no typed wrapper fits or when the value is intentionally held as `any`.
 
+## Dedicated Packages
+
+Use `httpassert` for assertions on `*http.Response` values:
+
+```go
+import ha "github.com/gogunit/gunit/hammy/httpassert"
+
+assert.Is(ha.Status(resp, http.StatusOK))
+assert.Is(ha.Header(resp, "Content-Type", "application/json"))
+assert.Is(ha.BodyContains(resp, `"ok":true`))
+```
+
+Use `jsonassert` for semantic JSON equality that ignores object key order and insignificant whitespace:
+
+```go
+import ja "github.com/gogunit/gunit/hammy/jsonassert"
+
+assert.Is(ja.Equal(actualJSON, expectedJSON))
+```
+
 ## Generic Matcher Core
 
 ```go
@@ -87,6 +107,21 @@ func Test_payload_has_expected_type(t *testing.T) {
 * [x] FileExists
 * [x] NoDirExists
 * [x] NoFileExists
+
+## HTTP (`hammy/httpassert`)
+
+* [x] BodyContains
+* [x] BodyEqual
+* [x] BodyMatchesRegexp
+* [x] Header
+* [x] HeaderContains
+* [x] Status
+* [x] StatusInRange
+
+## JSON (`hammy/jsonassert`)
+
+* [x] Equal
+* [x] EqualBytes
 
 ## Number
 
