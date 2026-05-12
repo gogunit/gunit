@@ -56,14 +56,37 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 * [x] EqualTo
 * [x] HasEntry
+* [x] HasEntries
 * [x] HasKeyMatching
 * [x] IsEmpty
 * [x] Len
 * [x] WithItem
+* [x] WithItems
 * [x] WithKeys
+* [x] WithoutItems
 * [x] WithoutKeys
 * [x] WithValues
 * [x] HasValueMatching
+
+## Error
+
+* [x] EqualError
+* [x] Error
+* [x] ErrorAs
+* [x] ErrorContains
+* [x] ErrorIs
+* [x] ErrorMatchesRegexp
+* [x] ErrorType
+* [x] NilError
+* [x] NotErrorAs
+* [x] NotErrorIs
+
+## Filesystem
+
+* [x] DirExists
+* [x] FileExists
+* [x] NoDirExists
+* [x] NoFileExists
 
 ## Number
 
@@ -80,13 +103,17 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## Slice
 
+* [x] Cap
 * [x] Contains
+* [x] ContainsAny
 * [x] ContainsInAnyOrder
 * [x] ContainsInOrder
 * [x] EqualTo
 * [x] Every
 * [x] HasItem
 * [x] Len
+* [x] NotSubsetOf
+* [x] SubsetOf
 
 ## String
 
@@ -107,6 +134,31 @@ func Test_payload_has_expected_type(t *testing.T) {
 * [x] EqualTo
 * [x] Having
 * [x] HavingField
+
+## Panic
+
+* [x] NotPanics
+* [x] PanicErrorIs
+* [x] Panics
+* [x] PanicsWithError
+* [x] PanicsWithValue
+
+## Polling
+
+* [x] Consistently
+* [x] Eventually
+* [x] Never
+
+## Time
+
+* [x] After
+* [x] AfterOrEqual
+* [x] Before
+* [x] BeforeOrEqual
+* [x] EqualTo
+* [x] Matches
+* [x] WithinDuration
+* [x] WithinRange
 
 ## Writing a Custom Matcher
 

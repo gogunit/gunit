@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
+	"path/filepath"
 	"regexp"
+	"time"
 
 	a "github.com/gogunit/gunit/hammy"
 )
@@ -39,6 +42,10 @@ var pointerPattern = regexp.MustCompile(`0x[0-9a-fA-F]+`)
 func printExample(result a.AssertionMessage) {
 	message := pointerPattern.ReplaceAllString(result.Message, "0xPTR")
 	fmt.Printf("message=%q\nsuccess=%t\n", message, result.IsSuccessful)
+}
+
+func printExampleSuccess(result a.AssertionMessage) {
+	fmt.Printf("success=%t\n", result.IsSuccessful)
 }
 
 func ExampleNil() {
@@ -103,6 +110,149 @@ func ExampleErrorAs() {
 	// success=true
 }
 
+func ExampleEqualError() {
+	printExample(a.EqualError(errors.New("boom"), "boom"))
+	// Output:
+	// message="got error message <boom>, want <boom>"
+	// success=true
+}
+
+func ExampleErrorContains() {
+	printExample(a.ErrorContains(errors.New("request timeout"), "timeout"))
+	// Output:
+	// message="got error message <request timeout>, want containing <timeout>"
+	// success=true
+}
+
+func ExampleErrorMatchesRegexp() {
+	printExample(a.ErrorMatchesRegexp(errors.New("status 503"), `status \d+`))
+	// Output:
+	// message="got error message <status 503>, want regexp <status \\d+>"
+	// success=true
+}
+
+func ExampleNotErrorIs() {
+	target := errors.New("timeout")
+	printExample(a.NotErrorIs(errors.New("network down"), target))
+	// Output:
+	// message="got <network down>, want error not matching <timeout>"
+	// success=true
+}
+
+func ExampleNotErrorAs() {
+	err := errors.New("network down")
+	var target exampleError
+	printExample(a.NotErrorAs(err, &target))
+	// Output:
+	// message="got <network down>, want error not assignable to <*hammy_test.exampleError>"
+	// success=true
+}
+
+func ExampleErrorType() {
+	err := fmt.Errorf("wrapped: %w", exampleError{})
+	printExample(a.ErrorType[exampleError](err))
+	// Output:
+	// message="got <wrapped: example error>, want error assignable to <hammy_test.exampleError>"
+	// success=true
+}
+
+func ExampleFileExists() {
+	dir, err := os.MkdirTemp("", "hammy-example-*")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	path := filepath.Join(dir, "payload.txt")
+	if err := os.WriteFile(path, []byte("payload"), 0o600); err != nil {
+		panic(err)
+	}
+
+	printExampleSuccess(a.FileExists(path))
+	// Output:
+	// success=true
+}
+
+func ExampleNoFileExists() {
+	dir, err := os.MkdirTemp("", "hammy-example-*")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	printExampleSuccess(a.NoFileExists(filepath.Join(dir, "missing.txt")))
+	// Output:
+	// success=true
+}
+
+func ExampleDirExists() {
+	dir, err := os.MkdirTemp("", "hammy-example-*")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	printExampleSuccess(a.DirExists(dir))
+	// Output:
+	// success=true
+}
+
+func ExampleNoDirExists() {
+	dir, err := os.MkdirTemp("", "hammy-example-*")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	printExampleSuccess(a.NoDirExists(filepath.Join(dir, "missing")))
+	// Output:
+	// success=true
+}
+
+func ExamplePanics() {
+	printExample(a.Panics(func() {
+		panic("boom")
+	}))
+	// Output:
+	// message="got no panic, wanted panic; recovered value <boom>"
+	// success=true
+}
+
+func ExampleNotPanics() {
+	printExample(a.NotPanics(func() {}))
+	// Output:
+	// message="got panic <<nil>>, wanted no panic"
+	// success=true
+}
+
+func ExamplePanicsWithValue() {
+	printExample(a.PanicsWithValue("boom", func() {
+		panic("boom")
+	}))
+	// Output:
+	// message="got panic value <boom>, wanted <boom>"
+	// success=true
+}
+
+func ExamplePanicsWithError() {
+	printExample(a.PanicsWithError("boom", func() {
+		panic(errors.New("boom"))
+	}))
+	// Output:
+	// message="got panic error <boom>, wanted <boom>"
+	// success=true
+}
+
+func ExamplePanicErrorIs() {
+	target := errors.New("target")
+	printExample(a.PanicErrorIs(target, func() {
+		panic(fmt.Errorf("wrapped: %w", target))
+	}))
+	// Output:
+	// message="got panic error <wrapped: target>, wanted matching <target>"
+	// success=true
+}
+
 func ExampleMatch() {
 	printExample(a.Match(5, a.GreaterThan(3)))
 	// Output:
@@ -147,11 +297,45 @@ func ExampleAnyOf() {
 	// success=true
 }
 
+func ExampleOneOf() {
+	printExample(a.Match("beta", a.OneOf("alpha", "beta", "gamma")))
+	// Output:
+	// message="got <beta>, wanted one of <[alpha beta gamma]>"
+	// success=true
+}
+
 func ExampleDescribe() {
 	printExample(a.Number(2).Matches(a.Describe("age check", a.GreaterThan(18))))
 	// Output:
 	// message="age check: got <2>, wanted greater than <18>"
 	// success=false
+}
+
+func ExampleEventually() {
+	printExample(a.Eventually(func() a.AssertionMessage {
+		return a.True(true)
+	}, 0, 0))
+	// Output:
+	// message="condition succeeded after 1 attempts"
+	// success=true
+}
+
+func ExampleNever() {
+	printExample(a.Never(func() a.AssertionMessage {
+		return a.True(false)
+	}, 0, 0))
+	// Output:
+	// message="condition stayed unsuccessful for <0s> after 1 attempts: got false, wanted true"
+	// success=true
+}
+
+func ExampleConsistently() {
+	printExample(a.Consistently(func() a.AssertionMessage {
+		return a.True(true)
+	}, 0, 0))
+	// Output:
+	// message="condition stayed successful for <0s> after 1 attempts"
+	// success=true
 }
 
 func ExampleEqualTo() {
@@ -309,6 +493,55 @@ func ExampleIsInfSign() {
 	printExample(a.Float(actual).Matches(a.IsInfSign[float64](-1)))
 	// Output:
 	// message="got <-Inf>, wanted infinity with sign <-1>"
+	// success=true
+}
+
+func ExampleBefore() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Matches(a.Before(actual.Add(time.Second))))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted before <2026-05-12 10:30:01 +0000 UTC>"
+	// success=true
+}
+
+func ExampleBeforeOrEqual() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Matches(a.BeforeOrEqual(actual)))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted before or equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleAfter() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Matches(a.After(actual.Add(-time.Second))))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted after <2026-05-12 10:29:59 +0000 UTC>"
+	// success=true
+}
+
+func ExampleAfterOrEqual() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Matches(a.AfterOrEqual(actual)))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted after or equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleWithinDuration() {
+	expected := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(expected.Add(500 * time.Millisecond)).Matches(a.WithinDuration(expected, time.Second)))
+	// Output:
+	// message="got <2026-05-12 10:30:00.5 +0000 UTC>, wanted within <1s> of <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleWithinRange() {
+	start := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	end := start.Add(time.Hour)
+	printExample(a.Time(start.Add(30 * time.Minute)).Matches(a.WithinRange(start, end)))
+	// Output:
+	// message="got <2026-05-12 11:00:00 +0000 UTC>, wanted in range <2026-05-12 10:30:00 +0000 UTC> to <2026-05-12 11:30:00 +0000 UTC>"
 	// success=true
 }
 
@@ -514,6 +747,13 @@ func ExampleSlc_Contains() {
 	// success=true
 }
 
+func ExampleSlc_ContainsAny() {
+	printExample(a.Slice([]int{1, 2, 3}).ContainsAny(2, 4))
+	// Output:
+	// message="got matching item <2>, wanted any of <[2 4]>"
+	// success=true
+}
+
 func ExampleSlc_NotContains() {
 	printExample(a.Slice([]int{1, 2, 3}).NotContains(4, 5))
 	// Output:
@@ -535,6 +775,14 @@ func ExampleSlc_Len() {
 	// success=true
 }
 
+func ExampleSlc_Cap() {
+	actual := make([]int, 0, 3)
+	printExample(a.Slice(actual).Cap(3))
+	// Output:
+	// message="got cap()=3, wanted 3"
+	// success=true
+}
+
 func ExampleSlc_IsEmpty() {
 	printExample(a.Slice([]int{}).IsEmpty())
 	// Output:
@@ -553,6 +801,20 @@ func ExampleSlc_ContainsExactly() {
 	printExample(a.Slice([]int{3, 2, 1}).ContainsExactly(1, 2, 3))
 	// Output:
 	// message="got 0 unmatched items, wanted array containing the 3 items. Items at index  were missing"
+	// success=true
+}
+
+func ExampleSlc_SubsetOf() {
+	printExample(a.Slice([]int{1, 3}).SubsetOf(1, 2, 3))
+	// Output:
+	// message="got items outside expected set <[]>, wanted subset of <[1 2 3]>"
+	// success=true
+}
+
+func ExampleSlc_NotSubsetOf() {
+	printExample(a.Slice([]int{1, 4}).NotSubsetOf(1, 2, 3))
+	// Output:
+	// message="got item <4> outside expected set <[1 2 3]>"
 	// success=true
 }
 
@@ -643,6 +905,20 @@ func ExampleMappy_WithItem() {
 	// success=true
 }
 
+func ExampleMappy_WithItems() {
+	printExample(a.Map(map[string]int{"alpha": 1}).WithItems(map[string]int{"alpha": 1}))
+	// Output:
+	// message="got missing keys <[]> and mismatched keys <[]>, wanted entries <map[alpha:1]>"
+	// success=true
+}
+
+func ExampleMappy_WithoutItems() {
+	printExample(a.Map(map[string]int{"alpha": 1}).WithoutItems(map[string]int{"alpha": 2}))
+	// Output:
+	// message="got entry <alpha:2> absent or different"
+	// success=true
+}
+
 func ExampleMappy_EqualTo() {
 	printExample(a.Map(map[string]int{"alpha": 1}).EqualTo(map[string]int{"alpha": 1}))
 	// Output:
@@ -692,6 +968,49 @@ func ExampleContainsInAnyOrder() {
 	)))
 	// Output:
 	// message="all 3 items matched in any order"
+	// success=true
+}
+
+func ExampleCapacity() {
+	actual := make([]int, 0, 3)
+	printExample(a.Slice(actual).Matches(a.Capacity[int](3)))
+	// Output:
+	// message="got cap()=3, wanted 3"
+	// success=true
+}
+
+func ExampleContainsAny() {
+	printExample(a.Slice([]int{1, 2, 3}).Matches(a.ContainsAny(2, 4)))
+	// Output:
+	// message="got matching item <2>, wanted any of <[2 4]>"
+	// success=true
+}
+
+func ExampleSubsetOf() {
+	printExample(a.Slice([]int{1, 3}).Matches(a.SubsetOf(1, 2, 3)))
+	// Output:
+	// message="got items outside expected set <[]>, wanted subset of <[1 2 3]>"
+	// success=true
+}
+
+func ExampleNotSubsetOf() {
+	printExample(a.Slice([]int{1, 4}).Matches(a.NotSubsetOf(1, 2, 3)))
+	// Output:
+	// message="got item <4> outside expected set <[1 2 3]>"
+	// success=true
+}
+
+func ExampleHasEntries() {
+	printExample(a.Map(map[string]int{"alpha": 1}).Matches(a.HasEntries(map[string]int{"alpha": 1})))
+	// Output:
+	// message="got missing keys <[]> and mismatched keys <[]>, wanted entries <map[alpha:1]>"
+	// success=true
+}
+
+func ExampleNotHasEntries() {
+	printExample(a.Map(map[string]int{"alpha": 1}).Matches(a.NotHasEntries(map[string]int{"alpha": 2})))
+	// Output:
+	// message="got entry <alpha:2> absent or different"
 	// success=true
 }
 
@@ -846,5 +1165,78 @@ func ExampleFlt_Matches() {
 	printExample(a.Float(10.0).Matches(a.CloseTo(10.1, 0.2)))
 	// Output:
 	// message="got <10>, wanted within <0.2> of <10.1>"
+	// success=true
+}
+
+func ExampleTime() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).EqualTo(actual))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_EqualTo() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).EqualTo(actual))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_Before() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Before(actual.Add(time.Second)))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted before <2026-05-12 10:30:01 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_BeforeOrEqual() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).BeforeOrEqual(actual))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted before or equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_After() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).After(actual.Add(-time.Second)))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted after <2026-05-12 10:29:59 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_AfterOrEqual() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).AfterOrEqual(actual))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted after or equal to <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_WithinDuration() {
+	expected := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(expected.Add(500*time.Millisecond)).WithinDuration(expected, time.Second))
+	// Output:
+	// message="got <2026-05-12 10:30:00.5 +0000 UTC>, wanted within <1s> of <2026-05-12 10:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_WithinRange() {
+	start := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	end := start.Add(time.Hour)
+	printExample(a.Time(start.Add(30*time.Minute)).WithinRange(start, end))
+	// Output:
+	// message="got <2026-05-12 11:00:00 +0000 UTC>, wanted in range <2026-05-12 10:30:00 +0000 UTC> to <2026-05-12 11:30:00 +0000 UTC>"
+	// success=true
+}
+
+func ExampleTim_Matches() {
+	actual := time.Date(2026, 5, 12, 10, 30, 0, 0, time.UTC)
+	printExample(a.Time(actual).Matches(a.WithinDuration(actual, time.Second)))
+	// Output:
+	// message="got <2026-05-12 10:30:00 +0000 UTC>, wanted within <1s> of <2026-05-12 10:30:00 +0000 UTC>"
 	// success=true
 }
