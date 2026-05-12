@@ -151,7 +151,15 @@ func (m Mappy[K, V]) WithItem(k K, expected V) AssertionMessage {
 	if !ok {
 		return Assert(false, "got key absent, wanted value for key <%v>", k)
 	}
-	return Assert(cmp.Equal(actual, expected), "got value=<%v> for key=<hi>, wanted <%v>", actual, expected)
+	return Assert(cmp.Equal(actual, expected), "got value=<%v> for key=<%v>, wanted <%v>", actual, k, expected)
+}
+
+func (m Mappy[K, V]) WithItems(expected map[K]V) AssertionMessage {
+	return HasEntries(expected).Match(m.actual)
+}
+
+func (m Mappy[K, V]) WithoutItems(expected map[K]V) AssertionMessage {
+	return NotHasEntries(expected).Match(m.actual)
 }
 
 func (m Mappy[K, V]) EqualTo(expected map[K]V) AssertionMessage {

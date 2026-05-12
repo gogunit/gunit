@@ -639,7 +639,7 @@ func ExampleMappy_Len() {
 func ExampleMappy_WithItem() {
 	printExample(a.Map(map[string]int{"alpha": 1}).WithItem("alpha", 1))
 	// Output:
-	// message="got value=<1> for key=<hi>, wanted <1>"
+	// message="got value=<1> for key=<alpha>, wanted <1>"
 	// success=true
 }
 

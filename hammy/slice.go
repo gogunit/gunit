@@ -41,6 +41,11 @@ func (a *Slc[I]) Contains(expected ...I) AssertionMessage {
 	return Assert(isSuccessful, "got %v unmatched items, wanted array containing the %v items. Items at index %v were missing", len(unmatched), len(expected), Join(unmatched, ", "))
 }
 
+// ContainsAny asserts that at least one expected element is present.
+func (a *Slc[I]) ContainsAny(expected ...I) AssertionMessage {
+	return ContainsAny(expected...).Match(a.actual)
+}
+
 // NotContains asserts that none of the expected elements are present.
 func (a *Slc[I]) NotContains(expected ...I) AssertionMessage {
 	var matched []int
@@ -79,6 +84,11 @@ func (a *Slc[I]) Len(expected int) AssertionMessage {
 	return Assert(sz == expected, "got len()=%d, wanted %d", sz, expected)
 }
 
+// Cap asserts that the slice has exactly the specified capacity.
+func (a *Slc[I]) Cap(expected int) AssertionMessage {
+	return Capacity[I](expected).Match(a.actual)
+}
+
 // IsEmpty asserts that the slice contains no elements.
 func (a *Slc[I]) IsEmpty() AssertionMessage {
 	sz := len(a.actual)
@@ -100,6 +110,16 @@ func (a *Slc[I]) ContainsExactly(expected ...I) AssertionMessage {
 	}
 
 	return a.Contains(expected...)
+}
+
+// SubsetOf asserts that every actual item is present in the expected superset.
+func (a *Slc[I]) SubsetOf(expected ...I) AssertionMessage {
+	return SubsetOf(expected...).Match(a.actual)
+}
+
+// NotSubsetOf asserts that at least one actual item is absent from the expected superset.
+func (a *Slc[I]) NotSubsetOf(expected ...I) AssertionMessage {
+	return NotSubsetOf(expected...).Match(a.actual)
 }
 
 func (a *Slc[I]) Every(matcher Matcher[I]) AssertionMessage {
