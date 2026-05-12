@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -65,6 +66,117 @@ func ValidBytes(actual []byte) hammy.AssertionMessage {
 	return hammy.Assert(true, "got valid JSON")
 }
 
+func Contains(actual, expected string) hammy.AssertionMessage {
+	return ContainsBytes([]byte(actual), []byte(expected))
+}
+
+func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
+	actualJSON, err := parseJSON(actual)
+	if err != nil {
+		return hammy.Assert(false, "actual JSON invalid: %v", err)
+	}
+
+	expectedJSON, err := parseJSON(expected)
+	if err != nil {
+		return hammy.Assert(false, "expected JSON invalid: %v", err)
+	}
+
+	if ok, message := containsJSON(actualJSON, expectedJSON, "$"); !ok {
+		return hammy.Assert(false, "%s", message)
+	}
+	return hammy.Assert(true, "JSON contained expected subset")
+}
+
+func PathExists(actual, path string) hammy.AssertionMessage {
+	actualJSON, err := parseJSON([]byte(actual))
+	if err != nil {
+		return hammy.Assert(false, "actual JSON invalid: %v", err)
+	}
+
+	if _, found, err := lookupJSONPath(actualJSON, path); err != nil {
+		return hammy.Assert(false, "invalid JSON path <%s>: %v", path, err)
+	} else if !found {
+		return hammy.Assert(false, "JSON path <%s> missing", path)
+	}
+	return hammy.Assert(true, "JSON path <%s> exists", path)
+}
+
+func PathMissing(actual, path string) hammy.AssertionMessage {
+	actualJSON, err := parseJSON([]byte(actual))
+	if err != nil {
+		return hammy.Assert(false, "actual JSON invalid: %v", err)
+	}
+
+	if _, found, err := lookupJSONPath(actualJSON, path); err != nil {
+		return hammy.Assert(false, "invalid JSON path <%s>: %v", path, err)
+	} else if found {
+		return hammy.Assert(false, "JSON path <%s> exists, wanted missing", path)
+	}
+	return hammy.Assert(true, "JSON path <%s> missing", path)
+}
+
+func PathEqual(actual, path, expected string) hammy.AssertionMessage {
+	return PathEqualBytes([]byte(actual), path, []byte(expected))
+}
+
+func PathEqualBytes(actual []byte, path string, expected []byte) hammy.AssertionMessage {
+	actualJSON, err := parseJSON(actual)
+	if err != nil {
+		return hammy.Assert(false, "actual JSON invalid: %v", err)
+	}
+
+	expectedJSON, err := parseJSON(expected)
+	if err != nil {
+		return hammy.Assert(false, "expected JSON invalid: %v", err)
+	}
+
+	actualValue, found, err := lookupJSONPath(actualJSON, path)
+	if err != nil {
+		return hammy.Assert(false, "invalid JSON path <%s>: %v", path, err)
+	}
+	if !found {
+		return hammy.Assert(false, "JSON path <%s> missing", path)
+	}
+
+	diff := cmp.Diff(expectedJSON, actualValue)
+	return hammy.Assert(diff == "", "JSON path <%s> mismatch (-want +got):\n%s", path, diff)
+}
+
+func ArrayContains(actual, path, expectedElement string) hammy.AssertionMessage {
+	return ArrayContainsBytes([]byte(actual), path, []byte(expectedElement))
+}
+
+func ArrayContainsBytes(actual []byte, path string, expectedElement []byte) hammy.AssertionMessage {
+	actualJSON, err := parseJSON(actual)
+	if err != nil {
+		return hammy.Assert(false, "actual JSON invalid: %v", err)
+	}
+
+	expectedJSON, err := parseJSON(expectedElement)
+	if err != nil {
+		return hammy.Assert(false, "expected JSON invalid: %v", err)
+	}
+
+	actualValue, found, err := lookupJSONPath(actualJSON, path)
+	if err != nil {
+		return hammy.Assert(false, "invalid JSON path <%s>: %v", path, err)
+	}
+	if !found {
+		return hammy.Assert(false, "JSON path <%s> missing", path)
+	}
+
+	actualArray, ok := actualValue.([]any)
+	if !ok {
+		return hammy.Assert(false, "got JSON path <%s> type <%T>, wanted array", path, actualValue)
+	}
+	for i, item := range actualArray {
+		if cmp.Equal(item, expectedJSON) {
+			return hammy.Assert(true, "found matching element at JSON path <%s> index <%d>", path, i)
+		}
+	}
+	return hammy.Assert(false, "got no matching element at JSON path <%s>", path)
+}
+
 func readJSON(name string, reader io.Reader) ([]byte, hammy.AssertionMessage) {
 	if reader == nil {
 		return nil, hammy.Assert(false, "%s JSON reader is nil", name)
@@ -74,6 +186,161 @@ func readJSON(name string, reader io.Reader) ([]byte, hammy.AssertionMessage) {
 		return nil, hammy.Assert(false, "%s JSON read error: %v", name, err)
 	}
 	return data, hammy.Assert(true, "%s JSON read", name)
+}
+
+func containsJSON(actual, expected any, path string) (bool, string) {
+	switch expectedValue := expected.(type) {
+	case map[string]any:
+		actualValue, ok := actual.(map[string]any)
+		if !ok {
+			return false, fmt.Sprintf("got JSON path <%s> type <%T>, wanted object", path, actual)
+		}
+
+		keys := make([]string, 0, len(expectedValue))
+		for key := range expectedValue {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			actualItem, ok := actualValue[key]
+			itemPath := joinPath(path, key)
+			if !ok {
+				return false, fmt.Sprintf("JSON path <%s> missing", itemPath)
+			}
+			if ok, message := containsJSON(actualItem, expectedValue[key], itemPath); !ok {
+				return false, message
+			}
+		}
+		return true, ""
+	case []any:
+		if diff := cmp.Diff(expected, actual); diff != "" {
+			return false, fmt.Sprintf("JSON path <%s> mismatch (-want +got):\n%s", path, diff)
+		}
+		return true, ""
+	default:
+		if !cmp.Equal(actual, expected) {
+			return false, fmt.Sprintf("JSON path <%s> mismatch (-want +got):\n%s", path, cmp.Diff(expected, actual))
+		}
+		return true, ""
+	}
+}
+
+func joinPath(path, key string) string {
+	if path == "$" {
+		return "$." + key
+	}
+	return path + "." + key
+}
+
+type pathStep struct {
+	key     string
+	index   int
+	isIndex bool
+}
+
+func lookupJSONPath(value any, path string) (any, bool, error) {
+	steps, err := parsePath(path)
+	if err != nil {
+		return nil, false, err
+	}
+
+	current := value
+	for _, step := range steps {
+		if step.isIndex {
+			items, ok := current.([]any)
+			if !ok || step.index < 0 || step.index >= len(items) {
+				return nil, false, nil
+			}
+			current = items[step.index]
+			continue
+		}
+
+		fields, ok := current.(map[string]any)
+		if !ok {
+			return nil, false, nil
+		}
+		next, ok := fields[step.key]
+		if !ok {
+			return nil, false, nil
+		}
+		current = next
+	}
+	return current, true, nil
+}
+
+func parsePath(path string) ([]pathStep, error) {
+	if path == "" {
+		return nil, fmt.Errorf("path is empty")
+	}
+	if path == "$" {
+		return nil, nil
+	}
+	path = strings.TrimPrefix(path, "$.")
+
+	var steps []pathStep
+	for i := 0; i < len(path); {
+		switch path[i] {
+		case '.':
+			return nil, fmt.Errorf("unexpected dot at offset %d", i)
+		case '[':
+			step, next, err := parseIndexStep(path, i)
+			if err != nil {
+				return nil, err
+			}
+			steps = append(steps, step)
+			i = next
+		default:
+			start := i
+			for i < len(path) && path[i] != '.' && path[i] != '[' && path[i] != ']' {
+				i++
+			}
+			if start == i {
+				return nil, fmt.Errorf("empty field at offset %d", start)
+			}
+			if i < len(path) && path[i] == ']' {
+				return nil, fmt.Errorf("unexpected closing bracket at offset %d", i)
+			}
+			steps = append(steps, pathStep{key: path[start:i]})
+		}
+
+		for i < len(path) && path[i] == '[' {
+			step, next, err := parseIndexStep(path, i)
+			if err != nil {
+				return nil, err
+			}
+			steps = append(steps, step)
+			i = next
+		}
+
+		if i < len(path) {
+			if path[i] != '.' {
+				return nil, fmt.Errorf("unexpected character %q at offset %d", path[i], i)
+			}
+			i++
+			if i == len(path) {
+				return nil, fmt.Errorf("path ends with dot")
+			}
+		}
+	}
+	return steps, nil
+}
+
+func parseIndexStep(path string, start int) (pathStep, int, error) {
+	end := strings.IndexByte(path[start:], ']')
+	if end < 0 {
+		return pathStep{}, 0, fmt.Errorf("unclosed index at offset %d", start)
+	}
+	end += start
+	rawIndex := path[start+1 : end]
+	if rawIndex == "" {
+		return pathStep{}, 0, fmt.Errorf("empty index at offset %d", start)
+	}
+	index, err := strconv.Atoi(rawIndex)
+	if err != nil || index < 0 {
+		return pathStep{}, 0, fmt.Errorf("invalid index <%s>", rawIndex)
+	}
+	return pathStep{index: index, isIndex: true}, end + 1, nil
 }
 
 func parseJSON(data []byte) (any, error) {

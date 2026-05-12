@@ -129,6 +129,119 @@ func Test_ValidReader_failure_read_error(t *testing.T) {
 	requireFailure(t, result, "actual JSON read error: read failed")
 }
 
+func Test_Contains_success_object_subset(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.Contains(
+		`{"status":"ok","meta":{"request_id":"abc","page":1}}`,
+		`{"status":"ok","meta":{"page":1.0}}`,
+	))
+}
+
+func Test_Contains_failure_missing_field(t *testing.T) {
+	result := jsonassert.Contains(`{"status":"ok"}`, `{"meta":{"page":1}}`)
+
+	requireFailure(t, result, "JSON path <$.meta> missing")
+}
+
+func Test_Contains_failure_mismatched_value(t *testing.T) {
+	result := jsonassert.Contains(`{"status":"ok"}`, `{"status":"failed"}`)
+
+	requireFailure(t, result, "JSON path <$.status> mismatch")
+}
+
+func Test_Contains_failure_array_order_sensitive(t *testing.T) {
+	result := jsonassert.Contains(`{"values":[1,2,3]}`, `{"values":[3,2,1]}`)
+
+	requireFailure(t, result, "JSON path <$.values> mismatch")
+}
+
+func Test_ContainsBytes_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.ContainsBytes([]byte(`{"status":"ok","extra":true}`), []byte(`{"status":"ok"}`)))
+}
+
+func Test_PathExists_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.PathExists(`{"user":{"name":"Ada"}}`, "user.name"))
+}
+
+func Test_PathExists_success_array_index(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.PathExists(`{"items":[{"id":1}]}`, "items[0].id"))
+}
+
+func Test_PathExists_failure_missing(t *testing.T) {
+	result := jsonassert.PathExists(`{"user":{"name":"Ada"}}`, "user.email")
+
+	requireFailure(t, result, "JSON path <user.email> missing")
+}
+
+func Test_PathExists_failure_invalid_path(t *testing.T) {
+	result := jsonassert.PathExists(`{"user":{"name":"Ada"}}`, "user.")
+
+	requireFailure(t, result, "invalid JSON path <user.>: path ends with dot")
+}
+
+func Test_PathMissing_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.PathMissing(`{"user":{"name":"Ada"}}`, "user.email"))
+}
+
+func Test_PathMissing_failure_exists(t *testing.T) {
+	result := jsonassert.PathMissing(`{"user":{"name":"Ada"}}`, "user.name")
+
+	requireFailure(t, result, "JSON path <user.name> exists, wanted missing")
+}
+
+func Test_PathEqual_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.PathEqual(`{"user":{"name":"Ada","age":37}}`, "user.age", `37.0`))
+}
+
+func Test_PathEqual_failure_mismatch(t *testing.T) {
+	result := jsonassert.PathEqual(`{"user":{"name":"Ada"}}`, "user.name", `"Grace"`)
+
+	requireFailure(t, result, "JSON path <user.name> mismatch (-want +got):")
+	requireFailure(t, result, "Grace")
+	requireFailure(t, result, "Ada")
+}
+
+func Test_PathEqualBytes_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.PathEqualBytes([]byte(`{"user":{"name":"Ada"}}`), "user.name", []byte(`"Ada"`)))
+}
+
+func Test_ArrayContains_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.ArrayContains(`{"items":[{"id":1},{"id":2}]}`, "items", `{"id":2.0}`))
+}
+
+func Test_ArrayContains_failure_missing_element(t *testing.T) {
+	result := jsonassert.ArrayContains(`{"items":[{"id":1}]}`, "items", `{"id":2}`)
+
+	requireFailure(t, result, "got no matching element at JSON path <items>")
+}
+
+func Test_ArrayContains_failure_non_array_path(t *testing.T) {
+	result := jsonassert.ArrayContains(`{"items":{"id":1}}`, "items", `{"id":1}`)
+
+	requireFailure(t, result, "wanted array")
+}
+
+func Test_ArrayContainsBytes_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.ArrayContainsBytes([]byte(`{"items":[1,2]}`), "items", []byte(`2.0`)))
+}
+
 func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string) {
 	t.Helper()
 	if result.IsSuccessful {
