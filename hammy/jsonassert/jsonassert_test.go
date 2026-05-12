@@ -1,6 +1,8 @@
 package jsonassert_test
 
 import (
+	"errors"
+	"io"
 	"strings"
 	"testing"
 
@@ -76,6 +78,57 @@ func Test_EqualBytes_success(t *testing.T) {
 	assert.Is(jsonassert.EqualBytes([]byte(`{"name":"Ada"}`), []byte(`{"name":"Ada"}`)))
 }
 
+func Test_EqualReader_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualReader(
+		strings.NewReader(`{"one":1}`),
+		strings.NewReader(`{"one":1.0}`),
+	))
+}
+
+func Test_EqualReader_failure_nil_actual_reader(t *testing.T) {
+	result := jsonassert.EqualReader(nil, strings.NewReader(`{"name":"Ada"}`))
+
+	requireFailure(t, result, "actual JSON reader is nil")
+}
+
+func Test_EqualReader_failure_expected_read_error(t *testing.T) {
+	result := jsonassert.EqualReader(strings.NewReader(`{"name":"Ada"}`), errorReader{})
+
+	requireFailure(t, result, "expected JSON read error: read failed")
+}
+
+func Test_Valid_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.Valid(`{"name":"Ada"}`))
+}
+
+func Test_Valid_failure(t *testing.T) {
+	result := jsonassert.Valid(`{"name":`)
+
+	requireFailure(t, result, "JSON invalid:")
+}
+
+func Test_ValidBytes_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.ValidBytes([]byte(`{"name":"Ada"}`)))
+}
+
+func Test_ValidReader_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.ValidReader(strings.NewReader(`{"name":"Ada"}`)))
+}
+
+func Test_ValidReader_failure_read_error(t *testing.T) {
+	result := jsonassert.ValidReader(errorReader{})
+
+	requireFailure(t, result, "actual JSON read error: read failed")
+}
+
 func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string) {
 	t.Helper()
 	if result.IsSuccessful {
@@ -85,3 +138,11 @@ func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string
 		t.Fatalf("got message %q, wanted containing %q", result.Message, contains)
 	}
 }
+
+type errorReader struct{}
+
+func (errorReader) Read([]byte) (int, error) {
+	return 0, errors.New("read failed")
+}
+
+var _ io.Reader = errorReader{}

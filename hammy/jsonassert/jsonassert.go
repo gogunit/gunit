@@ -17,6 +17,20 @@ func Equal(actual, expected string) hammy.AssertionMessage {
 	return EqualBytes([]byte(actual), []byte(expected))
 }
 
+func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
+	actualBytes, result := readJSON("actual", actual)
+	if !result.IsSuccessful {
+		return result
+	}
+
+	expectedBytes, result := readJSON("expected", expected)
+	if !result.IsSuccessful {
+		return result
+	}
+
+	return EqualBytes(actualBytes, expectedBytes)
+}
+
 func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
@@ -30,6 +44,36 @@ func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
 
 	diff := cmp.Diff(expectedJSON, actualJSON)
 	return hammy.Assert(diff == "", "JSON mismatch (-want +got):\n%s", diff)
+}
+
+func Valid(actual string) hammy.AssertionMessage {
+	return ValidBytes([]byte(actual))
+}
+
+func ValidReader(actual io.Reader) hammy.AssertionMessage {
+	actualBytes, result := readJSON("actual", actual)
+	if !result.IsSuccessful {
+		return result
+	}
+	return ValidBytes(actualBytes)
+}
+
+func ValidBytes(actual []byte) hammy.AssertionMessage {
+	if _, err := parseJSON(actual); err != nil {
+		return hammy.Assert(false, "JSON invalid: %v", err)
+	}
+	return hammy.Assert(true, "got valid JSON")
+}
+
+func readJSON(name string, reader io.Reader) ([]byte, hammy.AssertionMessage) {
+	if reader == nil {
+		return nil, hammy.Assert(false, "%s JSON reader is nil", name)
+	}
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, hammy.Assert(false, "%s JSON read error: %v", name, err)
+	}
+	return data, hammy.Assert(true, "%s JSON read", name)
 }
 
 func parseJSON(data []byte) (any, error) {
