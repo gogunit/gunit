@@ -63,6 +63,16 @@ assert.Is(ja.PathEqual(actualJSON, "user.name", `"Ada"`))
 assert.Is(ja.EqualWithOptions(actualJSON, expectedJSON, ja.IgnorePaths("meta.request_id")))
 ```
 
+Use `yamlassert` for semantic YAML equality, path checks, and multi-document streams:
+
+```go
+import ya "github.com/gogunit/gunit/hammy/yamlassert"
+
+assert.Is(ya.Equal(actualYAML, expectedYAML))
+assert.Is(ya.PathEqual(actualYAML, "user.name", "Ada\n"))
+assert.Is(ya.DocumentCount(actualYAML, 2))
+```
+
 ## Generic Matcher Core
 
 ```go
@@ -126,6 +136,33 @@ func Test_payload_has_expected_type(t *testing.T) {
 * [x] ArrayContainsBytes
 * [x] Contains
 * [x] ContainsBytes
+* [x] Equal
+* [x] EqualBytes
+* [x] EqualBytesWithOptions
+* [x] EqualReader
+* [x] EqualWithOptions
+* [x] IgnorePaths
+* [x] PathEqual
+* [x] PathEqualBytes
+* [x] PathExists
+* [x] PathMissing
+* [x] UnorderedArraysAt
+* [x] Valid
+* [x] ValidBytes
+* [x] ValidReader
+
+## YAML (`hammy/yamlassert`)
+
+* [x] ArrayContains
+* [x] ArrayContainsBytes
+* [x] Contains
+* [x] ContainsBytes
+* [x] DocumentContains
+* [x] DocumentContainsBytes
+* [x] DocumentCount
+* [x] DocumentCountBytes
+* [x] DocumentEqual
+* [x] DocumentEqualBytes
 * [x] Equal
 * [x] EqualBytes
 * [x] EqualBytesWithOptions
