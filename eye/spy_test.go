@@ -20,3 +20,11 @@ func Test_Spy_Errorf_called(t *testing.T) {
 		t.Errorf("Spy.Helper not called, should have")
 	}
 }
+
+func Test_Spy_Fatalf_called(t *testing.T) {
+	aSpy := eye.Spy()
+	aSpy.Fatalf("failure")
+	if !aSpy.FatalCalled {
+		t.Errorf("Spy.Fatalf not called, should have")
+	}
+}

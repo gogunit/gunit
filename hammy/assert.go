@@ -21,6 +21,13 @@ func (h *Hammy) Is(a AssertionMessage) {
 	}
 }
 
+func (h *Hammy) Requires(a AssertionMessage) {
+	h.Helper()
+	if !a.IsSuccessful {
+		h.Fatalf(a.Message)
+	}
+}
+
 func (h *Hammy) IsNot(a AssertionMessage) {
 	h.Helper()
 	if a.IsSuccessful {

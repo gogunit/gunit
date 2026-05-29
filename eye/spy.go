@@ -14,6 +14,8 @@ type TestSpy struct {
 	HelperCalled bool
 	ErrorCalled  bool
 	ErrorMessage string
+	FatalCalled  bool
+	FatalMessage string
 }
 
 func (spy *TestSpy) WasCalled(t *testing.T) {
@@ -41,6 +43,24 @@ func (spy *TestSpy) HadErrorContaining(t *testing.T, substr string) {
 	}
 }
 
+func (spy *TestSpy) HadFatal(t *testing.T) {
+	t.Helper()
+
+	spy.WasCalled(t)
+	if !spy.FatalCalled {
+		t.Errorf("got ghosted, wanted call to Spy.Fatalf")
+	}
+}
+
+func (spy *TestSpy) HadFatalContaining(t *testing.T, substr string) {
+	t.Helper()
+
+	spy.WasCalled(t)
+	if !strings.Contains(spy.FatalMessage, substr) {
+		t.Errorf("got:\n%s\nwanted call to spy.Fatalf containing:\n%s\n", spy.FatalMessage, substr)
+	}
+}
+
 func (spy *TestSpy) Helper() {
 	spy.HelperCalled = true
 }
@@ -48,4 +68,9 @@ func (spy *TestSpy) Helper() {
 func (spy *TestSpy) Errorf(format string, args ...any) {
 	spy.ErrorCalled = true
 	spy.ErrorMessage = fmt.Sprintf(format, args...)
+}
+
+func (spy *TestSpy) Fatalf(format string, args ...any) {
+	spy.FatalCalled = true
+	spy.FatalMessage = fmt.Sprintf(format, args...)
 }

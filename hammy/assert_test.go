@@ -19,6 +19,23 @@ func Test_Not_False_success(t *testing.T) {
 	assert.IsNot(a.False(true))
 }
 
+func Test_Requires_failure(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := a.New(aSpy)
+	assert.Requires(a.True(false))
+	aSpy.HadFatalContaining(t, "got false, wanted true")
+}
+
+func Test_Requires_success(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := a.New(aSpy)
+	assert.Requires(a.True(true))
+	aSpy.WasCalled(t)
+	if aSpy.FatalCalled {
+		t.Fatalf("got Fatalf call, wanted none")
+	}
+}
+
 func Test_Nil_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	assert := a.New(aSpy)
