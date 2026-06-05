@@ -139,9 +139,15 @@ func Test_payload_has_expected_type(t *testing.T) {
 * [x] Equal
 * [x] EqualBytes
 * [x] EqualBytesWithOptions
+* [x] EqualLines
+* [x] EqualLinesBytes
+* [x] EqualLinesBytesWithOptions
+* [x] EqualLinesWithOptions
 * [x] EqualReader
 * [x] EqualWithOptions
 * [x] IgnorePaths
+* [x] LinesContain
+* [x] LinesContainSubset
 * [x] PathEqual
 * [x] PathEqualBytes
 * [x] PathExists

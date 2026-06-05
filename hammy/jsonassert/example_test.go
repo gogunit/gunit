@@ -41,6 +41,46 @@ func ExampleEqualWithOptions() {
 	// success=true
 }
 
+func ExampleEqualLines() {
+	actual := `{"name":"Ada","age":37}` + "\n" + `{"name":"Grace","age":85}`
+	expected := `{"age":37.0,"name":"Ada"}` + "\n" + `{"age":85.0,"name":"Grace"}`
+
+	printExample(jsonassert.EqualLines(actual, expected))
+	// Output:
+	// message="JSONL mismatch (-want +got):\n"
+	// success=true
+}
+
+func ExampleEqualLinesWithOptions() {
+	actual := `{"status":"ok","meta":{"request_id":"abc"}}` + "\n" + `{"status":"ok","meta":{"request_id":"def"}}`
+	expected := `{"status":"ok","meta":{"request_id":"uvw"}}` + "\n" + `{"status":"ok","meta":{"request_id":"xyz"}}`
+
+	printExample(jsonassert.EqualLinesWithOptions(actual, expected, jsonassert.IgnorePaths("meta.request_id")))
+	// Output:
+	// message="JSONL mismatch (-want +got):\n"
+	// success=true
+}
+
+func ExampleEqualLinesBytes() {
+	actual := []byte(`{"id":1}` + "\n" + `{"id":2}`)
+	expected := []byte(`{"id":1.0}` + "\n" + `{"id":2.0}`)
+
+	printExample(jsonassert.EqualLinesBytes(actual, expected))
+	// Output:
+	// message="JSONL mismatch (-want +got):\n"
+	// success=true
+}
+
+func ExampleEqualLinesBytesWithOptions() {
+	actual := []byte(`{"tags":["go","test"]}` + "\n" + `{"tags":["json","assert"]}`)
+	expected := []byte(`{"tags":["test","go"]}` + "\n" + `{"tags":["assert","json"]}`)
+
+	printExample(jsonassert.EqualLinesBytesWithOptions(actual, expected, jsonassert.UnorderedArraysAt("tags")))
+	// Output:
+	// message="JSONL mismatch (-want +got):\n"
+	// success=true
+}
+
 func ExampleEqualBytes() {
 	actual := []byte(`{"one":1}`)
 	expected := []byte(`{"one":1.0}`)
@@ -109,6 +149,24 @@ func ExampleContainsBytes() {
 	printExample(jsonassert.ContainsBytes(actual, expected))
 	// Output:
 	// message="JSON contained expected subset"
+	// success=true
+}
+
+func ExampleLinesContain() {
+	actual := `{"id":1,"name":"Ada"}` + "\n" + `{"id":2,"name":"Grace"}`
+
+	printExample(jsonassert.LinesContain(actual, `{"name":"Grace","id":2.0}`))
+	// Output:
+	// message="found matching JSONL line <1>"
+	// success=true
+}
+
+func ExampleLinesContainSubset() {
+	actual := `{"status":"ok","meta":{"page":1,"request_id":"abc"}}` + "\n" + `{"status":"done"}`
+
+	printExample(jsonassert.LinesContainSubset(actual, `{"meta":{"page":1.0}}`))
+	// Output:
+	// message="found JSONL line <0> containing expected subset"
 	// success=true
 }
 

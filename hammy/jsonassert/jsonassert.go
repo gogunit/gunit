@@ -22,6 +22,65 @@ func EqualWithOptions(actual, expected string, opts ...Option) hammy.AssertionMe
 	return EqualBytesWithOptions([]byte(actual), []byte(expected), opts...)
 }
 
+func EqualLines(actual, expected string) hammy.AssertionMessage {
+	return EqualLinesWithOptions(actual, expected)
+}
+
+func EqualLinesWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
+	return EqualLinesBytesWithOptions([]byte(actual), []byte(expected), opts...)
+}
+
+func EqualLinesBytes(actual, expected []byte) hammy.AssertionMessage {
+	return EqualLinesBytesWithOptions(actual, expected)
+}
+
+func EqualLinesBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
+	actualLines := splitJSONLines(string(actual))
+	expectedLines := splitJSONLines(string(expected))
+
+	if len(actualLines) != len(expectedLines) {
+		firstDifferingIndex := min(len(actualLines), len(expectedLines))
+		return hammy.Assert(false, "got JSONL line count <%d>, wanted <%d>; first differing line index <%d>", len(actualLines), len(expectedLines), firstDifferingIndex)
+	}
+
+	for i := range actualLines {
+		actualJSON, err := parseJSON([]byte(actualLines[i]))
+		if err != nil {
+			return hammy.Assert(false, "actual JSONL line <%d> invalid: %v", i, err)
+		}
+
+		expectedJSON, err := parseJSON([]byte(expectedLines[i]))
+		if err != nil {
+			return hammy.Assert(false, "expected JSONL line <%d> invalid: %v", i, err)
+		}
+
+		actualJSON, expectedJSON, err = applyOptions(actualJSON, expectedJSON, opts...)
+		if err != nil {
+			return hammy.Assert(false, "JSONL line <%d>: %v", i, err)
+		}
+
+		diff := cmp.Diff(expectedJSON, actualJSON)
+		if diff != "" {
+			return hammy.Assert(false, "JSONL line <%d> mismatch (-want +got):\n%s", i, diff)
+		}
+	}
+
+	return hammy.Assert(true, "JSONL mismatch (-want +got):\n")
+}
+
+func LinesContain(actual, expected string, opts ...Option) hammy.AssertionMessage {
+	return linesContain(actual, expected, opts, func(actualJSON, expectedJSON any) bool {
+		return cmp.Equal(actualJSON, expectedJSON)
+	}, "found matching JSONL line <%d>", "got no matching JSONL line")
+}
+
+func LinesContainSubset(actual, expected string, opts ...Option) hammy.AssertionMessage {
+	return linesContain(actual, expected, opts, func(actualJSON, expectedJSON any) bool {
+		ok, _ := containsJSON(actualJSON, expectedJSON, "$")
+		return ok
+	}, "found JSONL line <%d> containing expected subset", "got no JSONL line containing expected subset")
+}
+
 func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
 	actualBytes, result := readJSON("actual", actual)
 	if !result.IsSuccessful {
@@ -218,6 +277,52 @@ func readJSON(name string, reader io.Reader) ([]byte, hammy.AssertionMessage) {
 		return nil, hammy.Assert(false, "%s JSON read error: %v", name, err)
 	}
 	return data, hammy.Assert(true, "%s JSON read", name)
+}
+
+func linesContain(actual, expected string, opts []Option, matches func(actualJSON, expectedJSON any) bool, successMessage, failureMessage string) hammy.AssertionMessage {
+	expectedBytes := []byte(expected)
+	if _, err := parseJSON(expectedBytes); err != nil {
+		return hammy.Assert(false, "expected JSON invalid: %v", err)
+	}
+
+	for i, actualLine := range splitJSONLines(actual) {
+		actualJSON, err := parseJSON([]byte(actualLine))
+		if err != nil {
+			return hammy.Assert(false, "actual JSONL line <%d> invalid: %v", i, err)
+		}
+
+		expectedJSON, err := parseJSON(expectedBytes)
+		if err != nil {
+			return hammy.Assert(false, "expected JSON invalid: %v", err)
+		}
+
+		actualJSON, expectedJSON, err = applyOptions(actualJSON, expectedJSON, opts...)
+		if err != nil {
+			return hammy.Assert(false, "JSONL line <%d>: %v", i, err)
+		}
+
+		if matches(actualJSON, expectedJSON) {
+			return hammy.Assert(true, successMessage, i)
+		}
+	}
+
+	return hammy.Assert(false, "%s", failureMessage)
+}
+
+func splitJSONLines(data string) []string {
+	if strings.HasSuffix(data, "\n") {
+		data = strings.TrimSuffix(data, "\n")
+		data = strings.TrimSuffix(data, "\r")
+	}
+	if data == "" {
+		return nil
+	}
+
+	lines := strings.Split(data, "\n")
+	for i := range lines {
+		lines[i] = strings.TrimSuffix(lines[i], "\r")
+	}
+	return lines
 }
 
 func applyOptions(actual, expected any, opts ...Option) (any, any, error) {

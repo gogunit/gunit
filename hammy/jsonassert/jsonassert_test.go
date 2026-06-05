@@ -99,6 +99,225 @@ func Test_EqualReader_failure_expected_read_error(t *testing.T) {
 	requireFailure(t, result, "expected JSON read error: read failed")
 }
 
+func Test_EqualLines_success_multiline(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLines(
+		`{"name":"Ada","age":37}`+"\n"+`{"tags":["go","json"]}`,
+		`{"age":37.0,"name":"Ada"}`+"\n"+`{"tags":["go","json"]}`,
+	))
+}
+
+func Test_EqualLines_success_trailing_newline(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLines(
+		"{\"id\":1}\n{\"id\":2}\n",
+		"{\"id\":1.0}\n{\"id\":2.0}\n",
+	))
+}
+
+func Test_EqualLines_success_crlf(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLines(
+		"{\"id\":1}\r\n{\"id\":2}\r\n",
+		"{\"id\":1.0}\r\n{\"id\":2.0}\r\n",
+	))
+}
+
+func Test_EqualLines_success_empty_inputs(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLines("", ""))
+}
+
+func Test_EqualLinesWithOptions_success_ignore_paths_per_line(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLinesWithOptions(
+		`{"status":"ok","meta":{"request_id":"abc"}}`+"\n"+`{"status":"ok","meta":{"request_id":"def"}}`,
+		`{"status":"ok","meta":{"request_id":"uvw"}}`+"\n"+`{"status":"ok","meta":{"request_id":"xyz"}}`,
+		jsonassert.IgnorePaths("meta.request_id"),
+	))
+}
+
+func Test_EqualLinesWithOptions_success_unordered_arrays_per_line(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLinesWithOptions(
+		`{"tags":["go","test"]}`+"\n"+`{"tags":["json","assert"]}`,
+		`{"tags":["test","go"]}`+"\n"+`{"tags":["assert","json"]}`,
+		jsonassert.UnorderedArraysAt("tags"),
+	))
+}
+
+func Test_EqualLinesBytes_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLinesBytes(
+		[]byte(`{"id":1}`+"\n"+`{"id":2}`),
+		[]byte(`{"id":1.0}`+"\n"+`{"id":2.0}`),
+	))
+}
+
+func Test_EqualLinesBytesWithOptions_success_ignore_paths_per_line(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.EqualLinesBytesWithOptions(
+		[]byte(`{"status":"ok","meta":{"request_id":"abc"}}`+"\n"+`{"status":"ok","meta":{"request_id":"def"}}`),
+		[]byte(`{"status":"ok","meta":{"request_id":"uvw"}}`+"\n"+`{"status":"ok","meta":{"request_id":"xyz"}}`),
+		jsonassert.IgnorePaths("meta.request_id"),
+	))
+}
+
+func Test_EqualLines_failure_reports_line_index(t *testing.T) {
+	result := jsonassert.EqualLines(
+		`{"id":1,"name":"Ada"}`+"\n"+`{"id":2,"name":"Grace"}`,
+		`{"id":1,"name":"Ada"}`+"\n"+`{"id":2,"name":"Katherine"}`,
+	)
+
+	requireFailure(t, result, "JSONL line <1> mismatch (-want +got):")
+	requireFailure(t, result, "Grace")
+	requireFailure(t, result, "Katherine")
+}
+
+func Test_EqualLinesBytes_failure_reports_line_index(t *testing.T) {
+	result := jsonassert.EqualLinesBytes(
+		[]byte(`{"id":1}`+"\n"+`{"id":2}`),
+		[]byte(`{"id":1}`+"\n"+`{"id":3}`),
+	)
+
+	requireFailure(t, result, "JSONL line <1> mismatch (-want +got):")
+}
+
+func Test_EqualLines_failure_invalid_actual_json_reports_line_index(t *testing.T) {
+	result := jsonassert.EqualLines(
+		`{"id":1}`+"\n"+`{"id":`,
+		`{"id":1}`+"\n"+`{"id":2}`,
+	)
+
+	requireFailure(t, result, "actual JSONL line <1> invalid:")
+}
+
+func Test_EqualLines_failure_invalid_expected_json_reports_line_index(t *testing.T) {
+	result := jsonassert.EqualLines(
+		`{"id":1}`+"\n"+`{"id":2}`,
+		`{"id":1}`+"\n"+`{"id":`,
+	)
+
+	requireFailure(t, result, "expected JSONL line <1> invalid:")
+}
+
+func Test_EqualLines_failure_blank_middle_line_invalid_json(t *testing.T) {
+	result := jsonassert.EqualLines(
+		`{"id":1}`+"\n\n"+`{"id":2}`,
+		`{"id":1}`+"\n\n"+`{"id":2}`,
+	)
+
+	requireFailure(t, result, "actual JSONL line <1> invalid:")
+}
+
+func Test_EqualLines_failure_line_count_mismatch_reports_index(t *testing.T) {
+	result := jsonassert.EqualLines(
+		`{"id":1}`,
+		`{"id":1}`+"\n"+`{"id":2}`,
+	)
+
+	requireFailure(t, result, "got JSONL line count <1>, wanted <2>; first differing line index <1>")
+}
+
+func Test_EqualLinesWithOptions_failure_invalid_option_reports_line_index(t *testing.T) {
+	result := jsonassert.EqualLinesWithOptions(
+		`{"status":"ok"}`,
+		`{"status":"ok"}`,
+		jsonassert.IgnorePaths("meta."),
+	)
+
+	requireFailure(t, result, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
+}
+
+func Test_LinesContain_success_full_record(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.LinesContain(
+		`{"id":1,"name":"Ada"}`+"\n"+`{"id":2,"score":1.0}`,
+		`{"score":1,"id":2}`,
+	))
+}
+
+func Test_LinesContain_success_ignore_paths(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.LinesContain(
+		`{"status":"ok","meta":{"request_id":"abc"}}`+"\n"+`{"status":"done","meta":{"request_id":"def"}}`,
+		`{"status":"done","meta":{"request_id":"xyz"}}`,
+		jsonassert.IgnorePaths("meta.request_id"),
+	))
+}
+
+func Test_LinesContain_failure_no_match(t *testing.T) {
+	result := jsonassert.LinesContain(
+		`{"id":1}`+"\n"+`{"id":2}`,
+		`{"id":3}`,
+	)
+
+	requireFailure(t, result, "got no matching JSONL line")
+}
+
+func Test_LinesContain_failure_invalid_expected_json(t *testing.T) {
+	result := jsonassert.LinesContain(`{"id":1}`, `{"id":`)
+
+	requireFailure(t, result, "expected JSON invalid:")
+}
+
+func Test_LinesContain_failure_invalid_actual_line(t *testing.T) {
+	result := jsonassert.LinesContain(
+		`{"id":1}`+"\n"+`{"id":`,
+		`{"id":2}`,
+	)
+
+	requireFailure(t, result, "actual JSONL line <1> invalid:")
+}
+
+func Test_LinesContain_failure_invalid_option_reports_line_index(t *testing.T) {
+	result := jsonassert.LinesContain(
+		`{"status":"ok"}`,
+		`{"status":"ok"}`,
+		jsonassert.IgnorePaths("meta."),
+	)
+
+	requireFailure(t, result, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
+}
+
+func Test_LinesContainSubset_success(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.LinesContainSubset(
+		`{"status":"ok","meta":{"request_id":"abc","page":1}}`+"\n"+`{"status":"done"}`,
+		`{"meta":{"page":1.0}}`,
+	))
+}
+
+func Test_LinesContainSubset_success_ignore_paths(t *testing.T) {
+	assert := hammy.New(t)
+
+	assert.Is(jsonassert.LinesContainSubset(
+		`{"status":"ok","meta":{"request_id":"abc","page":1}}`,
+		`{"meta":{"request_id":"xyz","page":1.0}}`,
+		jsonassert.IgnorePaths("meta.request_id"),
+	))
+}
+
+func Test_LinesContainSubset_failure_no_match(t *testing.T) {
+	result := jsonassert.LinesContainSubset(
+		`{"status":"ok"}`+"\n"+`{"status":"done"}`,
+		`{"meta":{"page":1}}`,
+	)
+
+	requireFailure(t, result, "got no JSONL line containing expected subset")
+}
+
 func Test_Valid_success(t *testing.T) {
 	assert := hammy.New(t)
 
