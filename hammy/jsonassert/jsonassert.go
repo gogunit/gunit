@@ -39,7 +39,10 @@ func EqualLinesBytesWithOptions(actual, expected []byte, opts ...Option) hammy.A
 	expectedLines := splitJSONLines(string(expected))
 
 	if len(actualLines) != len(expectedLines) {
-		firstDifferingIndex := min(len(actualLines), len(expectedLines))
+		firstDifferingIndex := len(actualLines)
+		if len(expectedLines) < firstDifferingIndex {
+			firstDifferingIndex = len(expectedLines)
+		}
 		return hammy.Assert(false, "got JSONL line count <%d>, wanted <%d>; first differing line index <%d>", len(actualLines), len(expectedLines), firstDifferingIndex)
 	}
 
