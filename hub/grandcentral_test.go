@@ -1,10 +1,19 @@
 package hub_test
 
 import (
+	"bytes"
+	"testing"
+
 	"github.com/gogunit/gunit/eye"
 	"github.com/gogunit/gunit/hub"
-	"testing"
 )
+
+func Test_Buffer(t *testing.T) {
+	aSpy := eye.Spy()
+	assert := hub.New(aSpy)
+	assert.Buffer(bytes.NewBufferString("hello")).EqualToString("hello")
+	aSpy.WasCalled(t)
+}
 
 func Test_Int(t *testing.T) {
 	aSpy := eye.Spy()

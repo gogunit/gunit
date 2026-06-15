@@ -1,12 +1,20 @@
 package hub
 
-import "github.com/gogunit/gunit"
+import (
+	"bytes"
+
+	"github.com/gogunit/gunit"
+)
 
 func New(t gunit.T) *GrandCentral {
 	return &GrandCentral{t: t}
 }
 
 type GrandCentral struct{ t gunit.T }
+
+func (c *GrandCentral) Buffer(actual *bytes.Buffer) *gunit.Buf {
+	return gunit.Buffer(c.t, actual)
+}
 
 func (c *GrandCentral) Int(actual int) *gunit.Num[int] {
 	return gunit.Number(c.t, actual)
