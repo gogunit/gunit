@@ -183,18 +183,53 @@ func (errorReadCloser) Close() error {
 
 var _ io.ReadCloser = errorReadCloser{}
 
-func Test_Response_methods_success(t *testing.T) {
+func Test_Response_Status_success(t *testing.T) {
 	assert := hammy.New(t)
-	resp := newResponse(http.StatusCreated, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "status 201")
-	actual := httpassert.Response(resp)
+	resp := newResponse(http.StatusCreated, nil, "")
 
-	assert.Is(actual.Status(http.StatusCreated))
-	assert.Is(actual.StatusInRange(200, 299))
-	assert.Is(actual.Header("Content-Type", "application/json; charset=utf-8"))
-	assert.Is(actual.HeaderContains("Content-Type", "application/json"))
-	assert.Is(actual.BodyEqual("status 201"))
-	assert.Is(actual.BodyContains("201"))
-	assert.Is(actual.BodyMatchesRegexp(`status \d+`))
+	assert.Is(httpassert.Response(resp).Status(http.StatusCreated))
+}
+
+func Test_Response_StatusInRange_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusNoContent, nil, "")
+
+	assert.Is(httpassert.Response(resp).StatusInRange(200, 299))
+}
+
+func Test_Response_Header_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Response(resp).Header("Content-Type", "application/json; charset=utf-8"))
+}
+
+func Test_Response_HeaderContains_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Response(resp).HeaderContains("Content-Type", "application/json"))
+}
+
+func Test_Response_BodyEqual_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 201")
+
+	assert.Is(httpassert.Response(resp).BodyEqual("status 201"))
+}
+
+func Test_Response_BodyContains_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 201")
+
+	assert.Is(httpassert.Response(resp).BodyContains("201"))
+}
+
+func Test_Response_BodyMatchesRegexp_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 201")
+
+	assert.Is(httpassert.Response(resp).BodyMatchesRegexp(`status \d+`))
 }
 
 func Test_Response_methods_failure_nil_receiver(t *testing.T) {
