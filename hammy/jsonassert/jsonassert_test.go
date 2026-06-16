@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gogunit/gunit/eye"
 	"github.com/gogunit/gunit/hammy"
 	"github.com/gogunit/gunit/hammy/jsonassert"
 )
@@ -28,7 +29,10 @@ func Test_Equal_success_reordered_object_keys(t *testing.T) {
 func Test_Equal_failure_array_order_mismatch(t *testing.T) {
 	result := jsonassert.Equal(`{"values":[1,2,3]}`, `{"values":[3,2,1]}`)
 
-	requireFailure(t, result, "JSON mismatch (-want +got):")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON mismatch (-want +got):")
 }
 
 func Test_Equal_success_numeric_spelling_equivalence(t *testing.T) {
@@ -49,27 +53,39 @@ func Test_Equal_success_large_numeric_spelling_equivalence(t *testing.T) {
 func Test_Equal_failure_invalid_actual_json(t *testing.T) {
 	result := jsonassert.Equal(`{"name":`, `{"name":"Ada"}`)
 
-	requireFailure(t, result, "actual JSON invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSON invalid:")
 }
 
 func Test_Equal_failure_invalid_expected_json(t *testing.T) {
 	result := jsonassert.Equal(`{"name":"Ada"}`, `{"name":`)
 
-	requireFailure(t, result, "expected JSON invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "expected JSON invalid:")
 }
 
 func Test_Equal_failure_multiple_actual_json_values(t *testing.T) {
 	result := jsonassert.Equal(`{"name":"Ada"} {"name":"Grace"}`, `{"name":"Ada"}`)
 
-	requireFailure(t, result, "actual JSON invalid: multiple JSON values")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSON invalid: multiple JSON values")
 }
 
 func Test_Equal_failure_includes_diff(t *testing.T) {
 	result := jsonassert.Equal(`{"name":"Ada"}`, `{"name":"Grace"}`)
 
-	requireFailure(t, result, "JSON mismatch (-want +got):")
-	requireFailure(t, result, `Grace`)
-	requireFailure(t, result, `Ada`)
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON mismatch (-want +got):")
+	aSpy.HadErrorContaining(t, `Grace`)
+	aSpy.HadErrorContaining(t, `Ada`)
 }
 
 func Test_EqualBytes_success(t *testing.T) {
@@ -90,13 +106,19 @@ func Test_EqualReader_success(t *testing.T) {
 func Test_EqualReader_failure_nil_actual_reader(t *testing.T) {
 	result := jsonassert.EqualReader(nil, strings.NewReader(`{"name":"Ada"}`))
 
-	requireFailure(t, result, "actual JSON reader is nil")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSON reader is nil")
 }
 
 func Test_EqualReader_failure_expected_read_error(t *testing.T) {
 	result := jsonassert.EqualReader(strings.NewReader(`{"name":"Ada"}`), errorReader{})
 
-	requireFailure(t, result, "expected JSON read error: read failed")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "expected JSON read error: read failed")
 }
 
 func Test_EqualLines_success_multiline(t *testing.T) {
@@ -177,9 +199,12 @@ func Test_EqualLines_failure_reports_line_index(t *testing.T) {
 		`{"id":1,"name":"Ada"}`+"\n"+`{"id":2,"name":"Katherine"}`,
 	)
 
-	requireFailure(t, result, "JSONL line <1> mismatch (-want +got):")
-	requireFailure(t, result, "Grace")
-	requireFailure(t, result, "Katherine")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSONL line <1> mismatch (-want +got):")
+	aSpy.HadErrorContaining(t, "Grace")
+	aSpy.HadErrorContaining(t, "Katherine")
 }
 
 func Test_EqualLinesBytes_failure_reports_line_index(t *testing.T) {
@@ -188,7 +213,10 @@ func Test_EqualLinesBytes_failure_reports_line_index(t *testing.T) {
 		[]byte(`{"id":1}`+"\n"+`{"id":3}`),
 	)
 
-	requireFailure(t, result, "JSONL line <1> mismatch (-want +got):")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSONL line <1> mismatch (-want +got):")
 }
 
 func Test_EqualLines_failure_invalid_actual_json_reports_line_index(t *testing.T) {
@@ -197,7 +225,10 @@ func Test_EqualLines_failure_invalid_actual_json_reports_line_index(t *testing.T
 		`{"id":1}`+"\n"+`{"id":2}`,
 	)
 
-	requireFailure(t, result, "actual JSONL line <1> invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSONL line <1> invalid:")
 }
 
 func Test_EqualLines_failure_invalid_expected_json_reports_line_index(t *testing.T) {
@@ -206,7 +237,10 @@ func Test_EqualLines_failure_invalid_expected_json_reports_line_index(t *testing
 		`{"id":1}`+"\n"+`{"id":`,
 	)
 
-	requireFailure(t, result, "expected JSONL line <1> invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "expected JSONL line <1> invalid:")
 }
 
 func Test_EqualLines_failure_blank_middle_line_invalid_json(t *testing.T) {
@@ -215,7 +249,10 @@ func Test_EqualLines_failure_blank_middle_line_invalid_json(t *testing.T) {
 		`{"id":1}`+"\n\n"+`{"id":2}`,
 	)
 
-	requireFailure(t, result, "actual JSONL line <1> invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSONL line <1> invalid:")
 }
 
 func Test_EqualLines_failure_line_count_mismatch_reports_index(t *testing.T) {
@@ -224,7 +261,10 @@ func Test_EqualLines_failure_line_count_mismatch_reports_index(t *testing.T) {
 		`{"id":1}`+"\n"+`{"id":2}`,
 	)
 
-	requireFailure(t, result, "got JSONL line count <1>, wanted <2>; first differing line index <1>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got JSONL line count <1>, wanted <2>; first differing line index <1>")
 }
 
 func Test_EqualLinesWithOptions_failure_invalid_option_reports_line_index(t *testing.T) {
@@ -234,7 +274,10 @@ func Test_EqualLinesWithOptions_failure_invalid_option_reports_line_index(t *tes
 		jsonassert.IgnorePaths("meta."),
 	)
 
-	requireFailure(t, result, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
 }
 
 func Test_LinesContain_success_full_record(t *testing.T) {
@@ -262,13 +305,19 @@ func Test_LinesContain_failure_no_match(t *testing.T) {
 		`{"id":3}`,
 	)
 
-	requireFailure(t, result, "got no matching JSONL line")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got no matching JSONL line")
 }
 
 func Test_LinesContain_failure_invalid_expected_json(t *testing.T) {
 	result := jsonassert.LinesContain(`{"id":1}`, `{"id":`)
 
-	requireFailure(t, result, "expected JSON invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "expected JSON invalid:")
 }
 
 func Test_LinesContain_failure_invalid_actual_line(t *testing.T) {
@@ -277,7 +326,10 @@ func Test_LinesContain_failure_invalid_actual_line(t *testing.T) {
 		`{"id":2}`,
 	)
 
-	requireFailure(t, result, "actual JSONL line <1> invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSONL line <1> invalid:")
 }
 
 func Test_LinesContain_failure_invalid_option_reports_line_index(t *testing.T) {
@@ -287,7 +339,10 @@ func Test_LinesContain_failure_invalid_option_reports_line_index(t *testing.T) {
 		jsonassert.IgnorePaths("meta."),
 	)
 
-	requireFailure(t, result, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSONL line <0>: invalid JSON path <meta.>: path ends with dot")
 }
 
 func Test_LinesContainSubset_success(t *testing.T) {
@@ -315,7 +370,10 @@ func Test_LinesContainSubset_failure_no_match(t *testing.T) {
 		`{"meta":{"page":1}}`,
 	)
 
-	requireFailure(t, result, "got no JSONL line containing expected subset")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got no JSONL line containing expected subset")
 }
 
 func Test_Valid_success(t *testing.T) {
@@ -327,7 +385,10 @@ func Test_Valid_success(t *testing.T) {
 func Test_Valid_failure(t *testing.T) {
 	result := jsonassert.Valid(`{"name":`)
 
-	requireFailure(t, result, "JSON invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON invalid:")
 }
 
 func Test_ValidBytes_success(t *testing.T) {
@@ -345,7 +406,10 @@ func Test_ValidReader_success(t *testing.T) {
 func Test_ValidReader_failure_read_error(t *testing.T) {
 	result := jsonassert.ValidReader(errorReader{})
 
-	requireFailure(t, result, "actual JSON read error: read failed")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual JSON read error: read failed")
 }
 
 func Test_Contains_success_object_subset(t *testing.T) {
@@ -360,19 +424,28 @@ func Test_Contains_success_object_subset(t *testing.T) {
 func Test_Contains_failure_missing_field(t *testing.T) {
 	result := jsonassert.Contains(`{"status":"ok"}`, `{"meta":{"page":1}}`)
 
-	requireFailure(t, result, "JSON path <$.meta> missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <$.meta> missing")
 }
 
 func Test_Contains_failure_mismatched_value(t *testing.T) {
 	result := jsonassert.Contains(`{"status":"ok"}`, `{"status":"failed"}`)
 
-	requireFailure(t, result, "JSON path <$.status> mismatch")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <$.status> mismatch")
 }
 
 func Test_Contains_failure_array_order_sensitive(t *testing.T) {
 	result := jsonassert.Contains(`{"values":[1,2,3]}`, `{"values":[3,2,1]}`)
 
-	requireFailure(t, result, "JSON path <$.values> mismatch")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <$.values> mismatch")
 }
 
 func Test_ContainsBytes_success(t *testing.T) {
@@ -396,13 +469,19 @@ func Test_PathExists_success_array_index(t *testing.T) {
 func Test_PathExists_failure_missing(t *testing.T) {
 	result := jsonassert.PathExists(`{"user":{"name":"Ada"}}`, "user.email")
 
-	requireFailure(t, result, "JSON path <user.email> missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <user.email> missing")
 }
 
 func Test_PathExists_failure_invalid_path(t *testing.T) {
 	result := jsonassert.PathExists(`{"user":{"name":"Ada"}}`, "user.")
 
-	requireFailure(t, result, "invalid JSON path <user.>: path ends with dot")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "invalid JSON path <user.>: path ends with dot")
 }
 
 func Test_PathMissing_success(t *testing.T) {
@@ -414,7 +493,10 @@ func Test_PathMissing_success(t *testing.T) {
 func Test_PathMissing_failure_exists(t *testing.T) {
 	result := jsonassert.PathMissing(`{"user":{"name":"Ada"}}`, "user.name")
 
-	requireFailure(t, result, "JSON path <user.name> exists, wanted missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <user.name> exists, wanted missing")
 }
 
 func Test_PathEqual_success(t *testing.T) {
@@ -426,9 +508,12 @@ func Test_PathEqual_success(t *testing.T) {
 func Test_PathEqual_failure_mismatch(t *testing.T) {
 	result := jsonassert.PathEqual(`{"user":{"name":"Ada"}}`, "user.name", `"Grace"`)
 
-	requireFailure(t, result, "JSON path <user.name> mismatch (-want +got):")
-	requireFailure(t, result, "Grace")
-	requireFailure(t, result, "Ada")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON path <user.name> mismatch (-want +got):")
+	aSpy.HadErrorContaining(t, "Grace")
+	aSpy.HadErrorContaining(t, "Ada")
 }
 
 func Test_PathEqualBytes_success(t *testing.T) {
@@ -446,13 +531,19 @@ func Test_ArrayContains_success(t *testing.T) {
 func Test_ArrayContains_failure_missing_element(t *testing.T) {
 	result := jsonassert.ArrayContains(`{"items":[{"id":1}]}`, "items", `{"id":2}`)
 
-	requireFailure(t, result, "got no matching element at JSON path <items>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got no matching element at JSON path <items>")
 }
 
 func Test_ArrayContains_failure_non_array_path(t *testing.T) {
 	result := jsonassert.ArrayContains(`{"items":{"id":1}}`, "items", `{"id":1}`)
 
-	requireFailure(t, result, "wanted array")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "wanted array")
 }
 
 func Test_ArrayContainsBytes_success(t *testing.T) {
@@ -484,7 +575,10 @@ func Test_EqualWithOptions_success_ignore_array_item_path(t *testing.T) {
 func Test_EqualWithOptions_failure_invalid_ignore_path(t *testing.T) {
 	result := jsonassert.EqualWithOptions(`{"status":"ok"}`, `{"status":"ok"}`, jsonassert.IgnorePaths("meta."))
 
-	requireFailure(t, result, "invalid JSON path <meta.>: path ends with dot")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "invalid JSON path <meta.>: path ends with dot")
 }
 
 func Test_EqualWithOptions_success_unordered_array(t *testing.T) {
@@ -514,7 +608,10 @@ func Test_EqualWithOptions_failure_unordered_array_non_array_path(t *testing.T) 
 		jsonassert.UnorderedArraysAt("items"),
 	)
 
-	requireFailure(t, result, "got JSON path <items> type <map[string]interface {}>, wanted array")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got JSON path <items> type <map[string]interface {}>, wanted array")
 }
 
 func Test_EqualWithOptions_failure_without_ignore_paths(t *testing.T) {
@@ -523,7 +620,10 @@ func Test_EqualWithOptions_failure_without_ignore_paths(t *testing.T) {
 		`{"status":"ok","meta":{"request_id":"xyz"}}`,
 	)
 
-	requireFailure(t, result, "JSON mismatch (-want +got):")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "JSON mismatch (-want +got):")
 }
 
 func Test_EqualBytesWithOptions_success(t *testing.T) {
@@ -534,16 +634,6 @@ func Test_EqualBytesWithOptions_success(t *testing.T) {
 		[]byte(`{"tags":["test","go"]}`),
 		jsonassert.UnorderedArraysAt("tags"),
 	))
-}
-
-func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string) {
-	t.Helper()
-	if result.IsSuccessful {
-		t.Fatalf("got success, wanted failure containing %q", contains)
-	}
-	if !strings.Contains(result.Message, contains) {
-		t.Fatalf("got message %q, wanted containing %q", result.Message, contains)
-	}
 }
 
 type errorReader struct{}
