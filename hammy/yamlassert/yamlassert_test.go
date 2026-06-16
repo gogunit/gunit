@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gogunit/gunit/eye"
 	"github.com/gogunit/gunit/hammy"
 	"github.com/gogunit/gunit/hammy/yamlassert"
 )
@@ -25,13 +26,19 @@ func Test_Equal_success_anchor_alias(t *testing.T) {
 func Test_Equal_failure_array_order_mismatch(t *testing.T) {
 	result := yamlassert.Equal("values: [1, 2, 3]\n", "values: [3, 2, 1]\n")
 
-	requireFailure(t, result, "YAML mismatch (-want +got):")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML mismatch (-want +got):")
 }
 
 func Test_Equal_failure_multiple_documents(t *testing.T) {
 	result := yamlassert.Equal("---\nname: Ada\n---\nname: Grace\n", "name: Ada\n")
 
-	requireFailure(t, result, "actual YAML invalid: multiple YAML documents")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual YAML invalid: multiple YAML documents")
 }
 
 func Test_EqualBytes_success(t *testing.T) {
@@ -55,13 +62,19 @@ func Test_Valid_success(t *testing.T) {
 func Test_Valid_failure_invalid_yaml(t *testing.T) {
 	result := yamlassert.Valid("name: [Ada\n")
 
-	requireFailure(t, result, "YAML invalid:")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML invalid:")
 }
 
 func Test_Valid_failure_duplicate_key(t *testing.T) {
 	result := yamlassert.Valid("name: Ada\nname: Grace\n")
 
-	requireFailure(t, result, "duplicate YAML key <name>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "duplicate YAML key <name>")
 }
 
 func Test_ValidBytes_success(t *testing.T) {
@@ -79,7 +92,10 @@ func Test_ValidReader_success(t *testing.T) {
 func Test_ValidReader_failure_read_error(t *testing.T) {
 	result := yamlassert.ValidReader(errorReader{})
 
-	requireFailure(t, result, "actual YAML read error: read failed")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "actual YAML read error: read failed")
 }
 
 func Test_Contains_success_mapping_subset(t *testing.T) {
@@ -91,7 +107,10 @@ func Test_Contains_success_mapping_subset(t *testing.T) {
 func Test_Contains_failure_missing_field(t *testing.T) {
 	result := yamlassert.Contains("status: ok\n", "meta:\n  page: 1\n")
 
-	requireFailure(t, result, "YAML path <$.meta> missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML path <$.meta> missing")
 }
 
 func Test_ContainsBytes_success(t *testing.T) {
@@ -115,7 +134,10 @@ func Test_PathExists_success_array_index(t *testing.T) {
 func Test_PathExists_failure_missing(t *testing.T) {
 	result := yamlassert.PathExists("user:\n  name: Ada\n", "user.email")
 
-	requireFailure(t, result, "YAML path <user.email> missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML path <user.email> missing")
 }
 
 func Test_PathMissing_success(t *testing.T) {
@@ -127,7 +149,10 @@ func Test_PathMissing_success(t *testing.T) {
 func Test_PathMissing_failure_exists(t *testing.T) {
 	result := yamlassert.PathMissing("user:\n  name: Ada\n", "user.name")
 
-	requireFailure(t, result, "YAML path <user.name> exists, wanted missing")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML path <user.name> exists, wanted missing")
 }
 
 func Test_PathEqual_success(t *testing.T) {
@@ -139,9 +164,12 @@ func Test_PathEqual_success(t *testing.T) {
 func Test_PathEqual_failure_mismatch(t *testing.T) {
 	result := yamlassert.PathEqual("user:\n  name: Ada\n", "user.name", "Grace\n")
 
-	requireFailure(t, result, "YAML path <user.name> mismatch (-want +got):")
-	requireFailure(t, result, "Grace")
-	requireFailure(t, result, "Ada")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "YAML path <user.name> mismatch (-want +got):")
+	aSpy.HadErrorContaining(t, "Grace")
+	aSpy.HadErrorContaining(t, "Ada")
 }
 
 func Test_PathEqualBytes_success(t *testing.T) {
@@ -159,7 +187,10 @@ func Test_ArrayContains_success(t *testing.T) {
 func Test_ArrayContains_failure_missing_element(t *testing.T) {
 	result := yamlassert.ArrayContains("items:\n  - id: 1\n", "items", "id: 2\n")
 
-	requireFailure(t, result, "got no matching element at YAML path <items>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got no matching element at YAML path <items>")
 }
 
 func Test_ArrayContainsBytes_success(t *testing.T) {
@@ -207,7 +238,10 @@ func Test_DocumentCount_success(t *testing.T) {
 func Test_DocumentCount_failure(t *testing.T) {
 	result := yamlassert.DocumentCount("---\nname: Ada\n---\nname: Grace\n", 1)
 
-	requireFailure(t, result, "got YAML document count <2>, wanted <1>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got YAML document count <2>, wanted <1>")
 }
 
 func Test_DocumentCountBytes_success(t *testing.T) {
@@ -236,7 +270,10 @@ func Test_DocumentEqual_success_with_options(t *testing.T) {
 func Test_DocumentEqual_failure_index_out_of_range(t *testing.T) {
 	result := yamlassert.DocumentEqual("---\nname: Ada\n", 1, "name: Ada\n")
 
-	requireFailure(t, result, "got YAML document index <1> out of range for count <1>")
+	aSpy := eye.Spy()
+	assert := hammy.New(aSpy)
+	assert.Is(result)
+	aSpy.HadErrorContaining(t, "got YAML document index <1> out of range for count <1>")
 }
 
 func Test_DocumentEqualBytes_success(t *testing.T) {
@@ -255,16 +292,6 @@ func Test_DocumentContainsBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
 	assert.Is(yamlassert.DocumentContainsBytes([]byte("---\nstatus: ok\n"), 0, []byte("status: ok\n")))
-}
-
-func requireFailure(t *testing.T, result hammy.AssertionMessage, contains string) {
-	t.Helper()
-	if result.IsSuccessful {
-		t.Fatalf("got success, wanted failure containing %q", contains)
-	}
-	if !strings.Contains(result.Message, contains) {
-		t.Fatalf("got message %q, wanted containing %q", result.Message, contains)
-	}
 }
 
 type errorReader struct{}
