@@ -182,3 +182,24 @@ func (errorReadCloser) Close() error {
 }
 
 var _ io.ReadCloser = errorReadCloser{}
+
+func Test_Response_methods_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusCreated, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "status 201")
+	actual := httpassert.Response(resp)
+
+	assert.Is(actual.Status(http.StatusCreated))
+	assert.Is(actual.StatusInRange(200, 299))
+	assert.Is(actual.Header("Content-Type", "application/json; charset=utf-8"))
+	assert.Is(actual.HeaderContains("Content-Type", "application/json"))
+	assert.Is(actual.BodyEqual("status 201"))
+	assert.Is(actual.BodyContains("201"))
+	assert.Is(actual.BodyMatchesRegexp(`status \d+`))
+}
+
+func Test_Response_methods_failure_nil_receiver(t *testing.T) {
+	var resp *httpassert.Resp
+	result := resp.Status(http.StatusOK)
+
+	requireFailure(t, result, "got nil response")
+}

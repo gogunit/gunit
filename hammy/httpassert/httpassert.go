@@ -10,7 +10,20 @@ import (
 	"github.com/gogunit/gunit/hammy"
 )
 
+func Response(resp *http.Response) *Resp {
+	return &Resp{actual: resp}
+}
+
+type Resp struct {
+	actual *http.Response
+}
+
 func Status(resp *http.Response, expected int) hammy.AssertionMessage {
+	return Response(resp).Status(expected)
+}
+
+func (r *Resp) Status(expected int) hammy.AssertionMessage {
+	resp := r.response()
 	if resp == nil {
 		return hammy.Assert(false, "got nil response, wanted status <%d>", expected)
 	}
@@ -18,6 +31,11 @@ func Status(resp *http.Response, expected int) hammy.AssertionMessage {
 }
 
 func StatusInRange(resp *http.Response, min, max int) hammy.AssertionMessage {
+	return Response(resp).StatusInRange(min, max)
+}
+
+func (r *Resp) StatusInRange(min, max int) hammy.AssertionMessage {
+	resp := r.response()
 	if min > max {
 		return hammy.Assert(false, "got invalid status range <%d..%d>", min, max)
 	}
@@ -28,6 +46,11 @@ func StatusInRange(resp *http.Response, min, max int) hammy.AssertionMessage {
 }
 
 func Header(resp *http.Response, key, expected string) hammy.AssertionMessage {
+	return Response(resp).Header(key, expected)
+}
+
+func (r *Resp) Header(key, expected string) hammy.AssertionMessage {
+	resp := r.response()
 	if resp == nil {
 		return hammy.Assert(false, "got nil response, wanted header <%s> equal to <%s>", key, expected)
 	}
@@ -36,6 +59,11 @@ func Header(resp *http.Response, key, expected string) hammy.AssertionMessage {
 }
 
 func HeaderContains(resp *http.Response, key, expected string) hammy.AssertionMessage {
+	return Response(resp).HeaderContains(key, expected)
+}
+
+func (r *Resp) HeaderContains(key, expected string) hammy.AssertionMessage {
+	resp := r.response()
 	if resp == nil {
 		return hammy.Assert(false, "got nil response, wanted header <%s> containing <%s>", key, expected)
 	}
@@ -44,7 +72,11 @@ func HeaderContains(resp *http.Response, key, expected string) hammy.AssertionMe
 }
 
 func BodyEqual(resp *http.Response, expected string) hammy.AssertionMessage {
-	actual, result := readBody(resp)
+	return Response(resp).BodyEqual(expected)
+}
+
+func (r *Resp) BodyEqual(expected string) hammy.AssertionMessage {
+	actual, result := readBody(r.response())
 	if !result.IsSuccessful {
 		return result
 	}
@@ -52,7 +84,11 @@ func BodyEqual(resp *http.Response, expected string) hammy.AssertionMessage {
 }
 
 func BodyContains(resp *http.Response, expected string) hammy.AssertionMessage {
-	actual, result := readBody(resp)
+	return Response(resp).BodyContains(expected)
+}
+
+func (r *Resp) BodyContains(expected string) hammy.AssertionMessage {
+	actual, result := readBody(r.response())
 	if !result.IsSuccessful {
 		return result
 	}
@@ -60,7 +96,11 @@ func BodyContains(resp *http.Response, expected string) hammy.AssertionMessage {
 }
 
 func BodyMatchesRegexp(resp *http.Response, pattern string) hammy.AssertionMessage {
-	actual, result := readBody(resp)
+	return Response(resp).BodyMatchesRegexp(pattern)
+}
+
+func (r *Resp) BodyMatchesRegexp(pattern string) hammy.AssertionMessage {
+	actual, result := readBody(r.response())
 	if !result.IsSuccessful {
 		return result
 	}
@@ -70,6 +110,13 @@ func BodyMatchesRegexp(resp *http.Response, pattern string) hammy.AssertionMessa
 		return hammy.Assert(false, "invalid regexp <%s>: %v", pattern, err)
 	}
 	return hammy.Assert(re.MatchString(actual), "got body <%s>, wanted regexp <%s>", actual, pattern)
+}
+
+func (r *Resp) response() *http.Response {
+	if r == nil {
+		return nil
+	}
+	return r.actual
 }
 
 func readBody(resp *http.Response) (string, hammy.AssertionMessage) {
