@@ -3,6 +3,7 @@ package httpassert_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gogunit/gunit/hammy"
@@ -20,13 +21,23 @@ func Test_Recorder_Status_failure(t *testing.T) {
 	rec := newRecorder(http.StatusCreated, nil, "")
 	result := httpassert.Recorder(rec).Status(http.StatusOK)
 
-	requireFailure(t, result, "got status <201>, wanted <200>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got status <201>, wanted <200>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got status <201>, wanted <200>")
+	}
 }
 
 func Test_Recorder_Status_failure_nil_recorder(t *testing.T) {
 	result := httpassert.Recorder(nil).Status(http.StatusOK)
 
-	requireFailure(t, result, "got nil response recorder")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got nil response recorder") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got nil response recorder")
+	}
 }
 
 func Test_Recorder_StatusInRange_success(t *testing.T) {
@@ -40,14 +51,24 @@ func Test_Recorder_StatusInRange_failure(t *testing.T) {
 	rec := newRecorder(http.StatusBadRequest, nil, "")
 	result := httpassert.Recorder(rec).StatusInRange(200, 299)
 
-	requireFailure(t, result, "got status <400>, wanted in range <200..299>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got status <400>, wanted in range <200..299>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got status <400>, wanted in range <200..299>")
+	}
 }
 
 func Test_Recorder_StatusInRange_failure_invalid_range(t *testing.T) {
 	rec := newRecorder(http.StatusOK, nil, "")
 	result := httpassert.Recorder(rec).StatusInRange(299, 200)
 
-	requireFailure(t, result, "got invalid status range <299..200>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got invalid status range <299..200>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got invalid status range <299..200>")
+	}
 }
 
 func Test_Recorder_Header_success(t *testing.T) {
@@ -61,7 +82,12 @@ func Test_Recorder_Header_failure(t *testing.T) {
 	rec := newRecorder(http.StatusOK, http.Header{"Content-Type": {"text/plain"}}, "")
 	result := httpassert.Recorder(rec).Header("Content-Type", "application/json")
 
-	requireFailure(t, result, "got header <Content-Type>=<text/plain>, wanted <application/json>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got header <Content-Type>=<text/plain>, wanted <application/json>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got header <Content-Type>=<text/plain>, wanted <application/json>")
+	}
 }
 
 func Test_Recorder_HeaderContains_success(t *testing.T) {
@@ -75,7 +101,12 @@ func Test_Recorder_HeaderContains_failure(t *testing.T) {
 	rec := newRecorder(http.StatusOK, http.Header{"Content-Type": {"text/plain"}}, "")
 	result := httpassert.Recorder(rec).HeaderContains("Content-Type", "application/json")
 
-	requireFailure(t, result, "got header <Content-Type>=<text/plain>, wanted containing <application/json>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got header <Content-Type>=<text/plain>, wanted containing <application/json>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got header <Content-Type>=<text/plain>, wanted containing <application/json>")
+	}
 }
 
 func Test_Recorder_BodyEqual_success(t *testing.T) {
@@ -89,7 +120,12 @@ func Test_Recorder_BodyEqual_failure(t *testing.T) {
 	rec := newRecorder(http.StatusOK, nil, "hello world")
 	result := httpassert.Recorder(rec).BodyEqual("goodbye")
 
-	requireFailure(t, result, "got body <hello world>, wanted equal to <goodbye>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got body <hello world>, wanted equal to <goodbye>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got body <hello world>, wanted equal to <goodbye>")
+	}
 }
 
 func Test_Recorder_BodyContains_success(t *testing.T) {
@@ -103,7 +139,12 @@ func Test_Recorder_BodyContains_failure(t *testing.T) {
 	rec := newRecorder(http.StatusOK, nil, "hello world")
 	result := httpassert.Recorder(rec).BodyContains("goodbye")
 
-	requireFailure(t, result, "got body <hello world>, wanted containing <goodbye>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got body <hello world>, wanted containing <goodbye>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got body <hello world>, wanted containing <goodbye>")
+	}
 }
 
 func Test_Recorder_BodyMatchesRegexp_success(t *testing.T) {
@@ -117,14 +158,24 @@ func Test_Recorder_BodyMatchesRegexp_failure(t *testing.T) {
 	rec := newRecorder(http.StatusOK, nil, "status 204")
 	result := httpassert.Recorder(rec).BodyMatchesRegexp(`status 5\d\d`)
 
-	requireFailure(t, result, "got body <status 204>, wanted regexp <status 5\\d\\d>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "got body <status 204>, wanted regexp <status 5\\d\\d>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "got body <status 204>, wanted regexp <status 5\\d\\d>")
+	}
 }
 
 func Test_Recorder_BodyMatchesRegexp_failure_invalid_pattern(t *testing.T) {
 	rec := newRecorder(http.StatusOK, nil, "status 204")
 	result := httpassert.Recorder(rec).BodyMatchesRegexp(`(`)
 
-	requireFailure(t, result, "invalid regexp <(>")
+	if result.IsSuccessful {
+		t.Fatal("got success, wanted failure")
+	}
+	if !strings.Contains(result.Message, "invalid regexp <(>") {
+		t.Fatalf("got message %q, wanted containing %q", result.Message, "invalid regexp <(>")
+	}
 }
 
 func Test_Recorder_Body_assertions_restore_body(t *testing.T) {
