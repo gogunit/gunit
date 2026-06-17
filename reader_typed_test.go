@@ -40,7 +40,9 @@ func Test_reader_EqualToBytes_failure(t *testing.T) {
 	aSpy.HadErrorContaining(t, "wanted")
 }
 
-func Test_reader_IsEmpty_success(t *testing.T) { gunit.Reader(t, strings.NewReader("")).IsEmpty() }
+func Test_reader_IsEmpty_success(t *testing.T) {
+	gunit.Reader(t, strings.NewReader("")).IsEmpty()
+}
 func Test_reader_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("x")).IsEmpty()
@@ -56,7 +58,9 @@ func Test_reader_IsNotEmpty_failure(t *testing.T) {
 	aSpy.HadErrorContaining(t, "wanted non-empty reader")
 }
 
-func Test_reader_NotEmpty_success(t *testing.T) { gunit.Reader(t, strings.NewReader("x")).NotEmpty() }
+func Test_reader_NotEmpty_success(t *testing.T) {
+	gunit.Reader(t, strings.NewReader("x")).NotEmpty()
+}
 func Test_reader_NotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("")).NotEmpty()

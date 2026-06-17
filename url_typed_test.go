@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func Test_url_Scheme_success(t *testing.T) { testURL(t).Scheme("https") }
+func Test_url_Scheme_success(t *testing.T) {
+	testURL(t).Scheme("https")
+}
 func Test_url_Scheme_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).Scheme("http")
@@ -18,28 +20,36 @@ func Test_url_Scheme_failure_for_nil(t *testing.T) {
 	aSpy.HadErrorContaining(t, "got nil URL")
 }
 
-func Test_url_Host_success(t *testing.T) { testURL(t).Host("example.com") }
+func Test_url_Host_success(t *testing.T) {
+	testURL(t).Host("example.com")
+}
 func Test_url_Host_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).Host("other.example")
 	aSpy.HadErrorContaining(t, "wanted <other.example>")
 }
 
-func Test_url_Path_success(t *testing.T) { testURL(t).Path("/path") }
+func Test_url_Path_success(t *testing.T) {
+	testURL(t).Path("/path")
+}
 func Test_url_Path_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).Path("/other")
 	aSpy.HadErrorContaining(t, "wanted </other>")
 }
 
-func Test_url_RawQuery_success(t *testing.T) { testURL(t).RawQuery("q=go") }
+func Test_url_RawQuery_success(t *testing.T) {
+	testURL(t).RawQuery("q=go")
+}
 func Test_url_RawQuery_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).RawQuery("q=rust")
 	aSpy.HadErrorContaining(t, "wanted <q=rust>")
 }
 
-func Test_url_QueryParam_success(t *testing.T) { testURL(t).QueryParam("q", "go") }
+func Test_url_QueryParam_success(t *testing.T) {
+	testURL(t).QueryParam("q", "go")
+}
 func Test_url_QueryParam_failure_for_missing(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).QueryParam("missing", "go")
@@ -51,14 +61,18 @@ func Test_url_QueryParam_failure_for_mismatch(t *testing.T) {
 	aSpy.HadErrorContaining(t, "wanted <rust>")
 }
 
-func Test_url_NoQueryParam_success(t *testing.T) { testURL(t).NoQueryParam("missing") }
+func Test_url_NoQueryParam_success(t *testing.T) {
+	testURL(t).NoQueryParam("missing")
+}
 func Test_url_NoQueryParam_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).NoQueryParam("q")
 	aSpy.HadErrorContaining(t, "wanted it absent")
 }
 
-func Test_url_String_success(t *testing.T) { testURL(t).String("https://example.com/path?q=go") }
+func Test_url_String_success(t *testing.T) {
+	testURL(t).String("https://example.com/path?q=go")
+}
 func Test_url_String_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	testURL(aSpy).String("https://example.com/other")

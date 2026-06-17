@@ -38,7 +38,9 @@ func Test_filesystem_NoFileExists_failure(t *testing.T) {
 	aSpy.HadErrorContaining(t, "wanted no file")
 }
 
-func Test_filesystem_DirExists_success(t *testing.T) { gunit.DirExists(t, t.TempDir()) }
+func Test_filesystem_DirExists_success(t *testing.T) {
+	gunit.DirExists(t, t.TempDir())
+}
 func Test_filesystem_DirExists_failure_for_missing(t *testing.T) {
 	dir := t.TempDir()
 	aSpy := eye.Spy()

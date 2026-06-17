@@ -8,14 +8,18 @@ import (
 	"testing"
 )
 
-func Test_error_NilError_success(t *testing.T) { gunit.NilError(t, nil) }
+func Test_error_NilError_success(t *testing.T) {
+	gunit.NilError(t, nil)
+}
 func Test_error_NilError_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.NilError(aSpy, errors.New("sentinel"))
 	aSpy.HadErrorContaining(t, "want nil error")
 }
 
-func Test_error_Error_success(t *testing.T) { gunit.Error(t, errors.New("sentinel")) }
+func Test_error_Error_success(t *testing.T) {
+	gunit.Error(t, errors.New("sentinel"))
+}
 func Test_error_Error_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Error(aSpy, nil)
