@@ -9,6 +9,7 @@ import (
 func Test_string_NotContains_success(t *testing.T) {
 	gunit.String(t, "Hello").NotContains("bye")
 }
+
 func Test_string_NotContains_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.String(aSpy, "Hello").NotContains("ell")
@@ -18,6 +19,7 @@ func Test_string_NotContains_failure(t *testing.T) {
 func Test_string_NotEmpty_success(t *testing.T) {
 	gunit.String(t, "Hello").NotEmpty()
 }
+
 func Test_string_NotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.String(aSpy, "").NotEmpty()
@@ -27,6 +29,7 @@ func Test_string_NotEmpty_failure(t *testing.T) {
 func Test_number_NotEqual_success(t *testing.T) {
 	gunit.Number(t, 1).NotEqual(2)
 }
+
 func Test_number_NotEqual_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Number(aSpy, 1).NotEqual(1)

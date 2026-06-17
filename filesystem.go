@@ -16,6 +16,7 @@ func FileExists(t T, path string) {
 		t.Errorf("got directory <%s>, wanted existing file", path)
 	}
 }
+
 func NoFileExists(t T, path string) {
 	t.Helper()
 	info, err := os.Stat(path)
@@ -30,6 +31,7 @@ func NoFileExists(t T, path string) {
 		t.Errorf("got existing file <%s>, wanted no file", path)
 	}
 }
+
 func DirExists(t T, path string) {
 	t.Helper()
 	info, err := os.Stat(path)
@@ -41,6 +43,7 @@ func DirExists(t T, path string) {
 		t.Errorf("got file <%s>, wanted existing directory", path)
 	}
 }
+
 func NoDirExists(t T, path string) {
 	t.Helper()
 	info, err := os.Stat(path)

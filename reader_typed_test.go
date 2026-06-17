@@ -11,6 +11,7 @@ import (
 func Test_reader_ContainsString_success(t *testing.T) {
 	gunit.Reader(t, strings.NewReader("hello world")).ContainsString("world")
 }
+
 func Test_reader_ContainsString_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("hello")).ContainsString("bye")
@@ -20,11 +21,13 @@ func Test_reader_ContainsString_failure(t *testing.T) {
 func Test_reader_EqualToString_success(t *testing.T) {
 	gunit.Reader(t, strings.NewReader("hello")).EqualToString("hello")
 }
+
 func Test_reader_EqualToString_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("hello")).EqualToString("bye")
 	aSpy.HadErrorContaining(t, "wanted <bye>")
 }
+
 func Test_reader_EqualToString_failure_for_nil(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, nil).EqualToString("hello")
@@ -34,6 +37,7 @@ func Test_reader_EqualToString_failure_for_nil(t *testing.T) {
 func Test_reader_EqualToBytes_success(t *testing.T) {
 	gunit.Reader(t, bytes.NewBufferString("bytes")).EqualToBytes([]byte("bytes"))
 }
+
 func Test_reader_EqualToBytes_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, bytes.NewBufferString("bytes")).EqualToBytes([]byte("other"))
@@ -43,6 +47,7 @@ func Test_reader_EqualToBytes_failure(t *testing.T) {
 func Test_reader_IsEmpty_success(t *testing.T) {
 	gunit.Reader(t, strings.NewReader("")).IsEmpty()
 }
+
 func Test_reader_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("x")).IsEmpty()
@@ -52,6 +57,7 @@ func Test_reader_IsEmpty_failure(t *testing.T) {
 func Test_reader_IsNotEmpty_success(t *testing.T) {
 	gunit.Reader(t, strings.NewReader("x")).IsNotEmpty()
 }
+
 func Test_reader_IsNotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("")).IsNotEmpty()
@@ -61,6 +67,7 @@ func Test_reader_IsNotEmpty_failure(t *testing.T) {
 func Test_reader_NotEmpty_success(t *testing.T) {
 	gunit.Reader(t, strings.NewReader("x")).NotEmpty()
 }
+
 func Test_reader_NotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Reader(aSpy, strings.NewReader("")).NotEmpty()

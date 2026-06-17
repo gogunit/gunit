@@ -26,6 +26,7 @@ func (u *URLAssert) Scheme(expected string) {
 		u.Errorf("got URL scheme <%s>, wanted <%s>", u.actual.Scheme, expected)
 	}
 }
+
 func (u *URLAssert) Host(expected string) {
 	if !u.ready() {
 		return
@@ -34,6 +35,7 @@ func (u *URLAssert) Host(expected string) {
 		u.Errorf("got URL host <%s>, wanted <%s>", u.actual.Host, expected)
 	}
 }
+
 func (u *URLAssert) Path(expected string) {
 	if !u.ready() {
 		return
@@ -42,6 +44,7 @@ func (u *URLAssert) Path(expected string) {
 		u.Errorf("got URL path <%s>, wanted <%s>", u.actual.Path, expected)
 	}
 }
+
 func (u *URLAssert) RawQuery(expected string) {
 	if !u.ready() {
 		return
@@ -50,6 +53,7 @@ func (u *URLAssert) RawQuery(expected string) {
 		u.Errorf("got URL raw query <%s>, wanted <%s>", u.actual.RawQuery, expected)
 	}
 }
+
 func (u *URLAssert) QueryParam(key, expected string) {
 	if !u.ready() {
 		return
@@ -63,6 +67,7 @@ func (u *URLAssert) QueryParam(key, expected string) {
 		u.Errorf("got URL query parameter <%s> value <%s>, wanted <%s>", key, values[0], expected)
 	}
 }
+
 func (u *URLAssert) NoQueryParam(key string) {
 	if !u.ready() {
 		return
@@ -71,6 +76,7 @@ func (u *URLAssert) NoQueryParam(key string) {
 		u.Errorf("got URL query parameter <%s>, wanted it absent", key)
 	}
 }
+
 func (u *URLAssert) String(expected string) {
 	if !u.ready() {
 		return

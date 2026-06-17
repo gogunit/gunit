@@ -25,6 +25,7 @@ func (r *ReaderAssert) EqualToString(expected string) {
 		r.Errorf("got reader string <%s>, wanted <%s>", string(actual), expected)
 	}
 }
+
 func (r *ReaderAssert) ContainsString(expected string) {
 	r.Helper()
 	actual, ok := r.readAll()
@@ -35,6 +36,7 @@ func (r *ReaderAssert) ContainsString(expected string) {
 		r.Errorf("got reader string <%s>, wanted substring <%s>", string(actual), expected)
 	}
 }
+
 func (r *ReaderAssert) EqualToBytes(expected []byte) {
 	r.Helper()
 	actual, ok := r.readAll()
@@ -45,6 +47,7 @@ func (r *ReaderAssert) EqualToBytes(expected []byte) {
 		r.Errorf("got reader bytes <%v>, wanted <%v>", actual, expected)
 	}
 }
+
 func (r *ReaderAssert) IsEmpty() {
 	r.Helper()
 	actual, ok := r.readAll()
@@ -55,6 +58,7 @@ func (r *ReaderAssert) IsEmpty() {
 		r.Errorf("got reader len()=%d, wanted empty reader", len(actual))
 	}
 }
+
 func (r *ReaderAssert) IsNotEmpty() {
 	r.Helper()
 	actual, ok := r.readAll()
@@ -65,6 +69,7 @@ func (r *ReaderAssert) IsNotEmpty() {
 		r.Errorf("got empty reader, wanted non-empty reader")
 	}
 }
+
 func (r *ReaderAssert) NotEmpty() { r.IsNotEmpty() }
 
 func (r *ReaderAssert) readAll() ([]byte, bool) {

@@ -60,24 +60,28 @@ func (s *Slc[I]) Len(expected int) {
 		s.Errorf("got len()=%d, wanted %d", len(s.actual), expected)
 	}
 }
+
 func (s *Slc[I]) Cap(expected int) {
 	s.Helper()
 	if cap(s.actual) != expected {
 		s.Errorf("got cap()=%d, wanted %d", cap(s.actual), expected)
 	}
 }
+
 func (s *Slc[I]) IsEmpty() {
 	s.Helper()
 	if len(s.actual) != 0 {
 		s.Errorf("got len()=%d, wanted 0", len(s.actual))
 	}
 }
+
 func (s *Slc[I]) IsNotEmpty() {
 	s.Helper()
 	if len(s.actual) == 0 {
 		s.Errorf("got len()=0, wanted > 0")
 	}
 }
+
 func (s *Slc[I]) NotEmpty() { s.IsNotEmpty() }
 
 func (s *Slc[I]) ContainsExactly(expected ...I) {
@@ -88,6 +92,7 @@ func (s *Slc[I]) ContainsExactly(expected ...I) {
 	}
 	s.Contains(expected...)
 }
+
 func (s *Slc[I]) SubsetOf(expected ...I) {
 	s.Helper()
 	for _, actual := range s.actual {
@@ -97,6 +102,7 @@ func (s *Slc[I]) SubsetOf(expected ...I) {
 		}
 	}
 }
+
 func (s *Slc[I]) NotSubsetOf(expected ...I) {
 	s.Helper()
 	for _, actual := range s.actual {
@@ -116,6 +122,7 @@ func missingItems[I any](actual, expected []I) []I {
 	}
 	return missing
 }
+
 func containsEqual[I any](items []I, target I) bool {
 	for _, item := range items {
 		if cmp.Equal(item, target) {

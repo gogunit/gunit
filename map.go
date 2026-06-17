@@ -137,6 +137,7 @@ func (m *Mappy[K, V]) NotEmpty() {
 		m.Errorf("got len=<0>, wanted non-empty map")
 	}
 }
+
 func (m *Mappy[K, V]) IsNotEmpty() { m.NotEmpty() }
 
 func (m *Mappy[K, V]) NotContains(values ...V) {

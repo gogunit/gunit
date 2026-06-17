@@ -9,6 +9,7 @@ import (
 func Test_slice_Contains_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2, 3}).Contains(2, 3)
 }
+
 func Test_slice_Contains_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).Contains(2)
@@ -18,6 +19,7 @@ func Test_slice_Contains_failure(t *testing.T) {
 func Test_slice_ContainsAny_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2, 3}).ContainsAny(4, 3)
 }
+
 func Test_slice_ContainsAny_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).ContainsAny(2)
@@ -27,6 +29,7 @@ func Test_slice_ContainsAny_failure(t *testing.T) {
 func Test_slice_NotContains_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2, 3}).NotContains(4)
 }
+
 func Test_slice_NotContains_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).NotContains(1)
@@ -36,6 +39,7 @@ func Test_slice_NotContains_failure(t *testing.T) {
 func Test_slice_EqualTo_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2, 3}).EqualTo(1, 2, 3)
 }
+
 func Test_slice_EqualTo_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).EqualTo(2)
@@ -45,6 +49,7 @@ func Test_slice_EqualTo_failure(t *testing.T) {
 func Test_slice_Len_success(t *testing.T) {
 	gunit.Slice(t, make([]int, 2, 4)).Len(2)
 }
+
 func Test_slice_Len_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).Len(2)
@@ -54,6 +59,7 @@ func Test_slice_Len_failure(t *testing.T) {
 func Test_slice_Cap_success(t *testing.T) {
 	gunit.Slice(t, make([]int, 2, 4)).Cap(4)
 }
+
 func Test_slice_Cap_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, make([]int, 1, 2)).Cap(1)
@@ -63,6 +69,7 @@ func Test_slice_Cap_failure(t *testing.T) {
 func Test_slice_IsEmpty_success(t *testing.T) {
 	gunit.Slice(t, []int{}).IsEmpty()
 }
+
 func Test_slice_IsEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).IsEmpty()
@@ -72,6 +79,7 @@ func Test_slice_IsEmpty_failure(t *testing.T) {
 func Test_slice_IsNotEmpty_success(t *testing.T) {
 	gunit.Slice(t, []int{1}).IsNotEmpty()
 }
+
 func Test_slice_IsNotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{}).IsNotEmpty()
@@ -81,6 +89,7 @@ func Test_slice_IsNotEmpty_failure(t *testing.T) {
 func Test_slice_NotEmpty_success(t *testing.T) {
 	gunit.Slice(t, []int{1}).NotEmpty()
 }
+
 func Test_slice_NotEmpty_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{}).NotEmpty()
@@ -90,6 +99,7 @@ func Test_slice_NotEmpty_failure(t *testing.T) {
 func Test_slice_ContainsExactly_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2}).ContainsExactly(2, 1)
 }
+
 func Test_slice_ContainsExactly_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1}).ContainsExactly(1, 2)
@@ -99,6 +109,7 @@ func Test_slice_ContainsExactly_failure(t *testing.T) {
 func Test_slice_SubsetOf_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 2}).SubsetOf(1, 2, 3)
 }
+
 func Test_slice_SubsetOf_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1, 4}).SubsetOf(1, 2, 3)
@@ -108,6 +119,7 @@ func Test_slice_SubsetOf_failure(t *testing.T) {
 func Test_slice_NotSubsetOf_success(t *testing.T) {
 	gunit.Slice(t, []int{1, 4}).NotSubsetOf(1, 2, 3)
 }
+
 func Test_slice_NotSubsetOf_failure(t *testing.T) {
 	aSpy := eye.Spy()
 	gunit.Slice(aSpy, []int{1, 2}).NotSubsetOf(1, 2, 3)
