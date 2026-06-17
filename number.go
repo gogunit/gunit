@@ -31,6 +31,10 @@ func (n *Num[N]) NotEqualTo(expected N) {
 	}
 }
 
+func (n *Num[N]) NotEqual(expected N) {
+	n.NotEqualTo(expected)
+}
+
 func (n *Num[N]) LessThan(expected N) {
 	n.Helper()
 	if n.actual >= expected {

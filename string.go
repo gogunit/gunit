@@ -29,6 +29,13 @@ func (s *Str[S]) Contains(needle S) {
 	}
 }
 
+func (s *Str[S]) NotContains(needle S) {
+	s.Helper()
+	if strings.Contains(string(s.actual), string(needle)) {
+		s.Errorf("want <%v> not to contain <%v>", s.actual, needle)
+	}
+}
+
 func (s *Str[S]) HasPrefix(prefix S) {
 	s.Helper()
 	if !strings.HasPrefix(string(s.actual), string(prefix)) {
@@ -41,6 +48,10 @@ func (s *Str[S]) HasSuffix(suffix S) {
 	if !strings.HasSuffix(string(s.actual), string(suffix)) {
 		s.Errorf("want <%v> to have prefix <%v>", s.actual, suffix)
 	}
+}
+
+func (s *Str[S]) NotEmpty() {
+	s.IsNotEmpty()
 }
 
 func (s *Str[S]) IsEmpty() {
