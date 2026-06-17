@@ -2,6 +2,7 @@ package gunit_test
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gogunit/gunit"
 	"github.com/gogunit/gunit/eye"
 	"testing"
@@ -70,7 +71,7 @@ func Test_error_ErrorMatchesRegexp_failure_for_mismatch(t *testing.T) {
 
 func Test_error_ErrorIs_success(t *testing.T) {
 	sentinel := errors.New("sentinel")
-	gunit.ErrorIs(t, errors.Join(errors.New("wrapped"), sentinel), sentinel)
+	gunit.ErrorIs(t, fmt.Errorf("wrapped: %w", sentinel), sentinel)
 }
 func Test_error_ErrorIs_failure(t *testing.T) {
 	aSpy := eye.Spy()
