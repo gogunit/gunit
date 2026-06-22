@@ -14,17 +14,17 @@ import (
 func Test_Equal_success_reordered_mapping_keys(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.Equal("name: Ada\nage: 37\n", "age: 37.0\nname: Ada\n"))
+	assert.Is(yamlassert.String("name: Ada\nage: 37\n").EqualTo("age: 37.0\nname: Ada\n"))
 }
 
 func Test_Equal_success_anchor_alias(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.Equal("name: &name Ada\nuser:\n  name: *name\n", "name: Ada\nuser:\n  name: Ada\n"))
+	assert.Is(yamlassert.String("name: &name Ada\nuser:\n  name: *name\n").EqualTo("name: Ada\nuser:\n  name: Ada\n"))
 }
 
 func Test_Equal_failure_array_order_mismatch(t *testing.T) {
-	result := yamlassert.Equal("values: [1, 2, 3]\n", "values: [3, 2, 1]\n")
+	result := yamlassert.String("values: [1, 2, 3]\n").EqualTo("values: [3, 2, 1]\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -33,7 +33,7 @@ func Test_Equal_failure_array_order_mismatch(t *testing.T) {
 }
 
 func Test_Equal_failure_multiple_documents(t *testing.T) {
-	result := yamlassert.Equal("---\nname: Ada\n---\nname: Grace\n", "name: Ada\n")
+	result := yamlassert.String("---\nname: Ada\n---\nname: Grace\n").EqualTo("name: Ada\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -44,23 +44,23 @@ func Test_Equal_failure_multiple_documents(t *testing.T) {
 func Test_EqualBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.EqualBytes([]byte("one: 1\n"), []byte("one: 1.0\n")))
+	assert.Is(yamlassert.Bytes([]byte("one: 1\n")).EqualTo([]byte("one: 1.0\n")))
 }
 
 func Test_EqualReader_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.EqualReader(strings.NewReader("one: 1\n"), strings.NewReader("one: 1.0\n")))
+	assert.Is(yamlassert.Reader(strings.NewReader("one: 1\n")).EqualTo(strings.NewReader("one: 1.0\n")))
 }
 
 func Test_Valid_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.Valid("name: Ada\n"))
+	assert.Is(yamlassert.String("name: Ada\n").IsValid())
 }
 
 func Test_Valid_failure_invalid_yaml(t *testing.T) {
-	result := yamlassert.Valid("name: [Ada\n")
+	result := yamlassert.String("name: [Ada\n").IsValid()
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -69,7 +69,7 @@ func Test_Valid_failure_invalid_yaml(t *testing.T) {
 }
 
 func Test_Valid_failure_duplicate_key(t *testing.T) {
-	result := yamlassert.Valid("name: Ada\nname: Grace\n")
+	result := yamlassert.String("name: Ada\nname: Grace\n").IsValid()
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -80,17 +80,17 @@ func Test_Valid_failure_duplicate_key(t *testing.T) {
 func Test_ValidBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.ValidBytes([]byte("name: Ada\n")))
+	assert.Is(yamlassert.Bytes([]byte("name: Ada\n")).IsValid())
 }
 
 func Test_ValidReader_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.ValidReader(strings.NewReader("name: Ada\n")))
+	assert.Is(yamlassert.Reader(strings.NewReader("name: Ada\n")).IsValid())
 }
 
 func Test_ValidReader_failure_read_error(t *testing.T) {
-	result := yamlassert.ValidReader(errorReader{})
+	result := yamlassert.Reader(errorReader{}).IsValid()
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -101,11 +101,11 @@ func Test_ValidReader_failure_read_error(t *testing.T) {
 func Test_Contains_success_mapping_subset(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.Contains("status: ok\nmeta:\n  page: 1\n  request_id: abc\n", "meta:\n  page: 1.0\n"))
+	assert.Is(yamlassert.String("status: ok\nmeta:\n  page: 1\n  request_id: abc\n").Contains("meta:\n  page: 1.0\n"))
 }
 
 func Test_Contains_failure_missing_field(t *testing.T) {
-	result := yamlassert.Contains("status: ok\n", "meta:\n  page: 1\n")
+	result := yamlassert.String("status: ok\n").Contains("meta:\n  page: 1\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -116,23 +116,23 @@ func Test_Contains_failure_missing_field(t *testing.T) {
 func Test_ContainsBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.ContainsBytes([]byte("status: ok\nextra: true\n"), []byte("status: ok\n")))
+	assert.Is(yamlassert.Bytes([]byte("status: ok\nextra: true\n")).Contains([]byte("status: ok\n")))
 }
 
 func Test_PathExists_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.PathExists("user:\n  name: Ada\n", "user.name"))
+	assert.Is(yamlassert.String("user:\n  name: Ada\n").PathExists("user.name"))
 }
 
 func Test_PathExists_success_array_index(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.PathExists("items:\n  - id: 1\n", "items[0].id"))
+	assert.Is(yamlassert.String("items:\n  - id: 1\n").PathExists("items[0].id"))
 }
 
 func Test_PathExists_failure_missing(t *testing.T) {
-	result := yamlassert.PathExists("user:\n  name: Ada\n", "user.email")
+	result := yamlassert.String("user:\n  name: Ada\n").PathExists("user.email")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -143,11 +143,11 @@ func Test_PathExists_failure_missing(t *testing.T) {
 func Test_PathMissing_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.PathMissing("user:\n  name: Ada\n", "user.email"))
+	assert.Is(yamlassert.String("user:\n  name: Ada\n").PathMissing("user.email"))
 }
 
 func Test_PathMissing_failure_exists(t *testing.T) {
-	result := yamlassert.PathMissing("user:\n  name: Ada\n", "user.name")
+	result := yamlassert.String("user:\n  name: Ada\n").PathMissing("user.name")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -158,11 +158,11 @@ func Test_PathMissing_failure_exists(t *testing.T) {
 func Test_PathEqual_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.PathEqual("user:\n  age: 37\n", "user.age", "37.0\n"))
+	assert.Is(yamlassert.String("user:\n  age: 37\n").PathEqual("user.age", "37.0\n"))
 }
 
 func Test_PathEqual_failure_mismatch(t *testing.T) {
-	result := yamlassert.PathEqual("user:\n  name: Ada\n", "user.name", "Grace\n")
+	result := yamlassert.String("user:\n  name: Ada\n").PathEqual("user.name", "Grace\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -175,17 +175,17 @@ func Test_PathEqual_failure_mismatch(t *testing.T) {
 func Test_PathEqualBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.PathEqualBytes([]byte("user:\n  name: Ada\n"), "user.name", []byte("Ada\n")))
+	assert.Is(yamlassert.Bytes([]byte("user:\n  name: Ada\n")).PathEqual("user.name", []byte("Ada\n")))
 }
 
 func Test_ArrayContains_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.ArrayContains("items:\n  - id: 1\n  - id: 2\n", "items", "id: 2.0\n"))
+	assert.Is(yamlassert.String("items:\n  - id: 1\n  - id: 2\n").ArrayContains("items", "id: 2.0\n"))
 }
 
 func Test_ArrayContains_failure_missing_element(t *testing.T) {
-	result := yamlassert.ArrayContains("items:\n  - id: 1\n", "items", "id: 2\n")
+	result := yamlassert.String("items:\n  - id: 1\n").ArrayContains("items", "id: 2\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -196,14 +196,13 @@ func Test_ArrayContains_failure_missing_element(t *testing.T) {
 func Test_ArrayContainsBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.ArrayContainsBytes([]byte("items: [1, 2]\n"), "items", []byte("2.0\n")))
+	assert.Is(yamlassert.Bytes([]byte("items: [1, 2]\n")).ArrayContains("items", []byte("2.0\n")))
 }
 
 func Test_EqualWithOptions_success_ignore_paths(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.EqualWithOptions(
-		"status: ok\nmeta:\n  request_id: abc\n",
+	assert.Is(yamlassert.String("status: ok\nmeta:\n  request_id: abc\n").EqualTo(
 		"status: ok\nmeta:\n  request_id: xyz\n",
 		yamlassert.IgnorePaths("meta.request_id"),
 	))
@@ -212,8 +211,7 @@ func Test_EqualWithOptions_success_ignore_paths(t *testing.T) {
 func Test_EqualWithOptions_success_unordered_array(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.EqualWithOptions(
-		"tags: [go, test, yaml]\n",
+	assert.Is(yamlassert.String("tags: [go, test, yaml]\n").EqualTo(
 		"tags: [yaml, go, test]\n",
 		yamlassert.UnorderedArraysAt("tags"),
 	))
@@ -222,8 +220,7 @@ func Test_EqualWithOptions_success_unordered_array(t *testing.T) {
 func Test_EqualBytesWithOptions_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.EqualBytesWithOptions(
-		[]byte("tags: [go, test]\n"),
+	assert.Is(yamlassert.Bytes([]byte("tags: [go, test]\n")).EqualTo(
 		[]byte("tags: [test, go]\n"),
 		yamlassert.UnorderedArraysAt("tags"),
 	))
@@ -232,11 +229,11 @@ func Test_EqualBytesWithOptions_success(t *testing.T) {
 func Test_DocumentCount_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentCount("---\nname: Ada\n---\nname: Grace\n", 2))
+	assert.Is(yamlassert.String("---\nname: Ada\n---\nname: Grace\n").DocumentCount(2))
 }
 
 func Test_DocumentCount_failure(t *testing.T) {
-	result := yamlassert.DocumentCount("---\nname: Ada\n---\nname: Grace\n", 1)
+	result := yamlassert.String("---\nname: Ada\n---\nname: Grace\n").DocumentCount(1)
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -247,20 +244,19 @@ func Test_DocumentCount_failure(t *testing.T) {
 func Test_DocumentCountBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentCountBytes([]byte("---\nname: Ada\n---\nname: Grace\n"), 2))
+	assert.Is(yamlassert.Bytes([]byte("---\nname: Ada\n---\nname: Grace\n")).DocumentCount(2))
 }
 
 func Test_DocumentEqual_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentEqual("---\nname: Ada\n---\nname: Grace\n", 1, "name: Grace\n"))
+	assert.Is(yamlassert.String("---\nname: Ada\n---\nname: Grace\n").DocumentEqual(1, "name: Grace\n"))
 }
 
 func Test_DocumentEqual_success_with_options(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentEqual(
-		"---\nstatus: ok\nmeta:\n  request_id: abc\n",
+	assert.Is(yamlassert.String("---\nstatus: ok\nmeta:\n  request_id: abc\n").DocumentEqual(
 		0,
 		"status: ok\nmeta:\n  request_id: xyz\n",
 		yamlassert.IgnorePaths("meta.request_id"),
@@ -268,7 +264,7 @@ func Test_DocumentEqual_success_with_options(t *testing.T) {
 }
 
 func Test_DocumentEqual_failure_index_out_of_range(t *testing.T) {
-	result := yamlassert.DocumentEqual("---\nname: Ada\n", 1, "name: Ada\n")
+	result := yamlassert.String("---\nname: Ada\n").DocumentEqual(1, "name: Ada\n")
 
 	aSpy := eye.Spy()
 	assert := hammy.New(aSpy)
@@ -279,19 +275,19 @@ func Test_DocumentEqual_failure_index_out_of_range(t *testing.T) {
 func Test_DocumentEqualBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentEqualBytes([]byte("---\nname: Ada\n"), 0, []byte("name: Ada\n")))
+	assert.Is(yamlassert.Bytes([]byte("---\nname: Ada\n")).DocumentEqual(0, []byte("name: Ada\n")))
 }
 
 func Test_DocumentContains_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentContains("---\nstatus: ok\nmeta:\n  page: 1\n", 0, "meta:\n  page: 1.0\n"))
+	assert.Is(yamlassert.String("---\nstatus: ok\nmeta:\n  page: 1\n").DocumentContains(0, "meta:\n  page: 1.0\n"))
 }
 
 func Test_DocumentContainsBytes_success(t *testing.T) {
 	assert := hammy.New(t)
 
-	assert.Is(yamlassert.DocumentContainsBytes([]byte("---\nstatus: ok\n"), 0, []byte("status: ok\n")))
+	assert.Is(yamlassert.Bytes([]byte("---\nstatus: ok\n")).DocumentContains(0, []byte("status: ok\n")))
 }
 
 type errorReader struct{}

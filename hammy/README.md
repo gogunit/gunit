@@ -68,9 +68,9 @@ Use `yamlassert` for semantic YAML equality, path checks, and multi-document str
 ```go
 import ya "github.com/gogunit/gunit/hammy/yamlassert"
 
-assert.Is(ya.Equal(actualYAML, expectedYAML))
-assert.Is(ya.PathEqual(actualYAML, "user.name", "Ada\n"))
-assert.Is(ya.DocumentCount(actualYAML, 2))
+assert.Is(ya.String(actualYAML).EqualTo(expectedYAML))
+assert.Is(ya.String(actualYAML).PathEqual("user.name", "Ada\n"))
+assert.Is(ya.String(actualYAML).DocumentCount(2))
 ```
 
 ## Generic Matcher Core
@@ -159,30 +159,32 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## YAML (`hammy/yamlassert`)
 
-* [x] ArrayContains
-* [x] ArrayContainsBytes
-* [x] Contains
-* [x] ContainsBytes
-* [x] DocumentContains
-* [x] DocumentContainsBytes
-* [x] DocumentCount
-* [x] DocumentCountBytes
-* [x] DocumentEqual
-* [x] DocumentEqualBytes
-* [x] Equal
-* [x] EqualBytes
-* [x] EqualBytesWithOptions
-* [x] EqualReader
-* [x] EqualWithOptions
+* [x] Bytes
+* [x] Bytes.ArrayContains
+* [x] Bytes.Contains
+* [x] Bytes.DocumentContains
+* [x] Bytes.DocumentCount
+* [x] Bytes.DocumentEqual
+* [x] Bytes.EqualTo
+* [x] Bytes.EqualToWithOptions
+* [x] Reader
+* [x] Reader.EqualTo
+* [x] Reader.IsValid
+* [x] String
+* [x] String.ArrayContains
+* [x] String.Contains
+* [x] String.DocumentContains
+* [x] String.DocumentCount
+* [x] String.DocumentEqual
+* [x] String.EqualTo
+* [x] String.EqualToWithOptions
 * [x] IgnorePaths
-* [x] PathEqual
-* [x] PathEqualBytes
-* [x] PathExists
-* [x] PathMissing
+* [x] String.PathEqual
+* [x] String.PathExists
+* [x] String.PathMissing
 * [x] UnorderedArraysAt
-* [x] Valid
-* [x] ValidBytes
-* [x] ValidReader
+* [x] String.IsValid
+* [x] Bytes.IsValid
 
 ## Number
 

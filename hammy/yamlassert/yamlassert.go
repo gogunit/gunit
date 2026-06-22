@@ -14,16 +14,40 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Equal(actual, expected string) hammy.AssertionMessage {
-	return EqualBytes([]byte(actual), []byte(expected))
+type StringAssert struct {
+	actual string
 }
 
-func EqualWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
-	return EqualBytesWithOptions([]byte(actual), []byte(expected), opts...)
+type BytesAssert struct {
+	actual []byte
 }
 
-func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
-	actualBytes, result := readYAML("actual", actual)
+type ReaderAssert struct {
+	actual io.Reader
+}
+
+func String(actual string) *StringAssert {
+	return &StringAssert{actual: actual}
+}
+
+func Bytes(actual []byte) *BytesAssert {
+	return &BytesAssert{actual: actual}
+}
+
+func Reader(actual io.Reader) *ReaderAssert {
+	return &ReaderAssert{actual: actual}
+}
+
+func (assert *StringAssert) EqualTo(expected string, opts ...Option) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).EqualTo([]byte(expected), opts...)
+}
+
+func (assert *StringAssert) EqualToWithOptions(expected string, opts ...Option) hammy.AssertionMessage {
+	return assert.EqualTo(expected, opts...)
+}
+
+func (assert *ReaderAssert) EqualTo(expected io.Reader) hammy.AssertionMessage {
+	actualBytes, result := readYAML("actual", assert.actual)
 	if !result.IsSuccessful {
 		return result
 	}
@@ -33,15 +57,15 @@ func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
 		return result
 	}
 
-	return EqualBytes(actualBytes, expectedBytes)
+	return Bytes(actualBytes).EqualTo(expectedBytes)
 }
 
-func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
-	return EqualBytesWithOptions(actual, expected)
+func (assert *BytesAssert) EqualTo(expected []byte, opts ...Option) hammy.AssertionMessage {
+	return assert.EqualToWithOptions(expected, opts...)
 }
 
-func EqualBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
-	actualYAML, err := parseYAML(actual)
+func (assert *BytesAssert) EqualToWithOptions(expected []byte, opts ...Option) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -79,31 +103,31 @@ type compareOptions struct {
 	unorderedArrayPaths []string
 }
 
-func Valid(actual string) hammy.AssertionMessage {
-	return ValidBytes([]byte(actual))
+func (assert *StringAssert) IsValid() hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).IsValid()
 }
 
-func ValidReader(actual io.Reader) hammy.AssertionMessage {
-	actualBytes, result := readYAML("actual", actual)
+func (assert *ReaderAssert) IsValid() hammy.AssertionMessage {
+	actualBytes, result := readYAML("actual", assert.actual)
 	if !result.IsSuccessful {
 		return result
 	}
-	return ValidBytes(actualBytes)
+	return Bytes(actualBytes).IsValid()
 }
 
-func ValidBytes(actual []byte) hammy.AssertionMessage {
-	if _, err := parseYAMLDocuments(actual); err != nil {
+func (assert *BytesAssert) IsValid() hammy.AssertionMessage {
+	if _, err := parseYAMLDocuments(assert.actual); err != nil {
 		return hammy.Assert(false, "YAML invalid: %v", err)
 	}
 	return hammy.Assert(true, "got valid YAML")
 }
 
-func Contains(actual, expected string) hammy.AssertionMessage {
-	return ContainsBytes([]byte(actual), []byte(expected))
+func (assert *StringAssert) Contains(expected string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).Contains([]byte(expected))
 }
 
-func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
-	actualYAML, err := parseYAML(actual)
+func (assert *BytesAssert) Contains(expected []byte) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -119,8 +143,12 @@ func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
 	return hammy.Assert(true, "YAML contained expected subset")
 }
 
-func PathExists(actual, path string) hammy.AssertionMessage {
-	actualYAML, err := parseYAML([]byte(actual))
+func (assert *StringAssert) PathExists(path string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).PathExists(path)
+}
+
+func (assert *BytesAssert) PathExists(path string) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -133,8 +161,12 @@ func PathExists(actual, path string) hammy.AssertionMessage {
 	return hammy.Assert(true, "YAML path <%s> exists", path)
 }
 
-func PathMissing(actual, path string) hammy.AssertionMessage {
-	actualYAML, err := parseYAML([]byte(actual))
+func (assert *StringAssert) PathMissing(path string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).PathMissing(path)
+}
+
+func (assert *BytesAssert) PathMissing(path string) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -147,12 +179,12 @@ func PathMissing(actual, path string) hammy.AssertionMessage {
 	return hammy.Assert(true, "YAML path <%s> missing", path)
 }
 
-func PathEqual(actual, path, expected string) hammy.AssertionMessage {
-	return PathEqualBytes([]byte(actual), path, []byte(expected))
+func (assert *StringAssert) PathEqual(path, expected string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).PathEqual(path, []byte(expected))
 }
 
-func PathEqualBytes(actual []byte, path string, expected []byte) hammy.AssertionMessage {
-	actualYAML, err := parseYAML(actual)
+func (assert *BytesAssert) PathEqual(path string, expected []byte) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -174,12 +206,12 @@ func PathEqualBytes(actual []byte, path string, expected []byte) hammy.Assertion
 	return hammy.Assert(diff == "", "YAML path <%s> mismatch (-want +got):\n%s", path, diff)
 }
 
-func ArrayContains(actual, path, expectedElement string) hammy.AssertionMessage {
-	return ArrayContainsBytes([]byte(actual), path, []byte(expectedElement))
+func (assert *StringAssert) ArrayContains(path, expectedElement string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).ArrayContains(path, []byte(expectedElement))
 }
 
-func ArrayContainsBytes(actual []byte, path string, expectedElement []byte) hammy.AssertionMessage {
-	actualYAML, err := parseYAML(actual)
+func (assert *BytesAssert) ArrayContains(path string, expectedElement []byte) hammy.AssertionMessage {
+	actualYAML, err := parseYAML(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -209,24 +241,24 @@ func ArrayContainsBytes(actual []byte, path string, expectedElement []byte) hamm
 	return hammy.Assert(false, "got no matching element at YAML path <%s>", path)
 }
 
-func DocumentCount(actual string, expected int) hammy.AssertionMessage {
-	return DocumentCountBytes([]byte(actual), expected)
+func (assert *StringAssert) DocumentCount(expected int) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).DocumentCount(expected)
 }
 
-func DocumentCountBytes(actual []byte, expected int) hammy.AssertionMessage {
-	documents, err := parseYAMLDocuments(actual)
+func (assert *BytesAssert) DocumentCount(expected int) hammy.AssertionMessage {
+	documents, err := parseYAMLDocuments(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "YAML invalid: %v", err)
 	}
 	return hammy.Assert(len(documents) == expected, "got YAML document count <%d>, wanted <%d>", len(documents), expected)
 }
 
-func DocumentEqual(actual string, index int, expected string, opts ...Option) hammy.AssertionMessage {
-	return DocumentEqualBytes([]byte(actual), index, []byte(expected), opts...)
+func (assert *StringAssert) DocumentEqual(index int, expected string, opts ...Option) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).DocumentEqual(index, []byte(expected), opts...)
 }
 
-func DocumentEqualBytes(actual []byte, index int, expected []byte, opts ...Option) hammy.AssertionMessage {
-	documents, err := parseYAMLDocuments(actual)
+func (assert *BytesAssert) DocumentEqual(index int, expected []byte, opts ...Option) hammy.AssertionMessage {
+	documents, err := parseYAMLDocuments(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
@@ -248,12 +280,12 @@ func DocumentEqualBytes(actual []byte, index int, expected []byte, opts ...Optio
 	return hammy.Assert(diff == "", "YAML document <%d> mismatch (-want +got):\n%s", index, diff)
 }
 
-func DocumentContains(actual string, index int, expected string) hammy.AssertionMessage {
-	return DocumentContainsBytes([]byte(actual), index, []byte(expected))
+func (assert *StringAssert) DocumentContains(index int, expected string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).DocumentContains(index, []byte(expected))
 }
 
-func DocumentContainsBytes(actual []byte, index int, expected []byte) hammy.AssertionMessage {
-	documents, err := parseYAMLDocuments(actual)
+func (assert *BytesAssert) DocumentContains(index int, expected []byte) hammy.AssertionMessage {
+	documents, err := parseYAMLDocuments(assert.actual)
 	if err != nil {
 		return hammy.Assert(false, "actual YAML invalid: %v", err)
 	}
