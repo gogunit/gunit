@@ -19,6 +19,9 @@ type RecorderAssert struct {
 	actual *httptest.ResponseRecorder
 }
 
+// HasStatus asserts that the recorded response status equals expected. It is an alias for Status.
+func (r *RecorderAssert) HasStatus(expected int) hammy.AssertionMessage { return r.Status(expected) }
+
 // Status asserts that the recorded response status equals expected.
 func (r *RecorderAssert) Status(expected int) hammy.AssertionMessage {
 	resp, result := r.response()
@@ -26,6 +29,11 @@ func (r *RecorderAssert) Status(expected int) hammy.AssertionMessage {
 		return hammy.Assert(false, "got nil response recorder, wanted status <%d>", expected)
 	}
 	return hammy.Assert(resp.StatusCode == expected, "got status <%d>, wanted <%d>", resp.StatusCode, expected)
+}
+
+// HasStatusInRange asserts that the recorded response status is between min and max, inclusive. It is an alias for StatusInRange.
+func (r *RecorderAssert) HasStatusInRange(min, max int) hammy.AssertionMessage {
+	return r.StatusInRange(min, max)
 }
 
 // StatusInRange asserts that the recorded response status is between min and max, inclusive.
@@ -40,6 +48,16 @@ func (r *RecorderAssert) StatusInRange(min, max int) hammy.AssertionMessage {
 	return hammy.Assert(resp.StatusCode >= min && resp.StatusCode <= max, "got status <%d>, wanted in range <%d..%d>", resp.StatusCode, min, max)
 }
 
+// HeaderEqualTo asserts that the recorded response header equals expected. It is an alias for Header.
+func (r *RecorderAssert) HeaderEqualTo(key, expected string) hammy.AssertionMessage {
+	return r.Header(key, expected)
+}
+
+// HasHeader asserts that the recorded response header equals expected. It is an alias for Header.
+func (r *RecorderAssert) HasHeader(key, expected string) hammy.AssertionMessage {
+	return r.Header(key, expected)
+}
+
 // Header asserts that the recorded response header equals expected.
 func (r *RecorderAssert) Header(key, expected string) hammy.AssertionMessage {
 	resp, result := r.response()
@@ -48,6 +66,11 @@ func (r *RecorderAssert) Header(key, expected string) hammy.AssertionMessage {
 	}
 	actual := resp.Header.Get(key)
 	return hammy.Assert(actual == expected, "got header <%s>=<%s>, wanted <%s>", key, actual, expected)
+}
+
+// HasHeaderContaining asserts that the recorded response header contains expected. It is an alias for HeaderContains.
+func (r *RecorderAssert) HasHeaderContaining(key, expected string) hammy.AssertionMessage {
+	return r.HeaderContains(key, expected)
 }
 
 // HeaderContains asserts that the recorded response header contains expected.
@@ -60,6 +83,11 @@ func (r *RecorderAssert) HeaderContains(key, expected string) hammy.AssertionMes
 	return hammy.Assert(strings.Contains(actual, expected), "got header <%s>=<%s>, wanted containing <%s>", key, actual, expected)
 }
 
+// BodyEqualTo asserts that the recorded response body equals expected. It is an alias for BodyEqual.
+func (r *RecorderAssert) BodyEqualTo(expected string) hammy.AssertionMessage {
+	return r.BodyEqual(expected)
+}
+
 // BodyEqual asserts that the recorded response body equals expected.
 func (r *RecorderAssert) BodyEqual(expected string) hammy.AssertionMessage {
 	actual, result := r.body()
@@ -69,6 +97,11 @@ func (r *RecorderAssert) BodyEqual(expected string) hammy.AssertionMessage {
 	return hammy.Assert(actual == expected, "got body <%s>, wanted equal to <%s>", actual, expected)
 }
 
+// HasBodyContaining asserts that the recorded response body contains expected. It is an alias for BodyContains.
+func (r *RecorderAssert) HasBodyContaining(expected string) hammy.AssertionMessage {
+	return r.BodyContains(expected)
+}
+
 // BodyContains asserts that the recorded response body contains expected.
 func (r *RecorderAssert) BodyContains(expected string) hammy.AssertionMessage {
 	actual, result := r.body()
@@ -76,6 +109,11 @@ func (r *RecorderAssert) BodyContains(expected string) hammy.AssertionMessage {
 		return hammy.Assert(false, "got nil response recorder, wanted response body")
 	}
 	return hammy.Assert(strings.Contains(actual, expected), "got body <%s>, wanted containing <%s>", actual, expected)
+}
+
+// BodyMatches asserts that the recorded response body matches pattern. It is an alias for BodyMatchesRegexp.
+func (r *RecorderAssert) BodyMatches(pattern string) hammy.AssertionMessage {
+	return r.BodyMatchesRegexp(pattern)
 }
 
 // BodyMatchesRegexp asserts that the recorded response body matches pattern.

@@ -148,13 +148,15 @@ func Test_Recorder_BodyMatchesRegexp_failure_invalid_pattern(t *testing.T) {
 	aSpy.HadErrorContaining(t, "invalid regexp <(>")
 }
 
-func Test_Recorder_Body_assertions_restore_body(t *testing.T) {
+func Test_Recorder_Body_assertion_keeps_body(t *testing.T) {
 	assert := hammy.New(t)
-	recorderAssert := httpassert.Recorder(newRecorder(http.StatusOK, nil, "hello world"))
+	rec := newRecorder(http.StatusOK, nil, "hello world")
 
-	assert.Is(recorderAssert.BodyContains("hello"))
-	assert.Is(recorderAssert.BodyEqual("hello world"))
-	assert.Is(recorderAssert.BodyMatchesRegexp(`world$`))
+	assert.Is(httpassert.Recorder(rec).BodyContains("hello"))
+
+	if rec.Body.String() != "hello world" {
+		t.Fatalf("got recorder body %q, wanted %q", rec.Body.String(), "hello world")
+	}
 }
 
 func newRecorder(status int, headers http.Header, body string) *httptest.ResponseRecorder {
@@ -167,4 +169,60 @@ func newRecorder(status int, headers http.Header, body string) *httptest.Respons
 	recorder.WriteHeader(status)
 	_, _ = recorder.WriteString(body)
 	return recorder
+}
+
+func Test_Recorder_HasStatus_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, nil, "")
+
+	assert.Is(httpassert.Recorder(rec).HasStatus(http.StatusOK))
+}
+
+func Test_Recorder_HasStatusInRange_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, nil, "")
+
+	assert.Is(httpassert.Recorder(rec).HasStatusInRange(200, 299))
+}
+
+func Test_Recorder_HeaderEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Recorder(rec).HeaderEqualTo("Content-Type", "application/json; charset=utf-8"))
+}
+
+func Test_Recorder_HasHeader_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Recorder(rec).HasHeader("Content-Type", "application/json; charset=utf-8"))
+}
+
+func Test_Recorder_HasHeaderContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Recorder(rec).HasHeaderContaining("Content-Type", "application/json"))
+}
+
+func Test_Recorder_BodyEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Recorder(rec).BodyEqualTo("status 204"))
+}
+
+func Test_Recorder_HasBodyContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Recorder(rec).HasBodyContaining("204"))
+}
+
+func Test_Recorder_BodyMatches_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	rec := newRecorder(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Recorder(rec).BodyMatches(`status \d+`))
 }
