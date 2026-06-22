@@ -58,9 +58,9 @@ Use `jsonassert` for semantic JSON equality that ignores object key order and in
 ```go
 import ja "github.com/gogunit/gunit/hammy/jsonassert"
 
-assert.Is(ja.Equal(actualJSON, expectedJSON))
-assert.Is(ja.PathEqual(actualJSON, "user.name", `"Ada"`))
-assert.Is(ja.EqualWithOptions(actualJSON, expectedJSON, ja.IgnorePaths("meta.request_id")))
+assert.Is(ja.String(actualJSON).EqualTo(expectedJSON))
+assert.Is(ja.String(actualJSON).PathEqual("user.name", `"Ada"`))
+assert.Is(ja.String(actualJSON).EqualToWithOptions(expectedJSON, ja.IgnorePaths("meta.request_id")))
 ```
 
 Use `yamlassert` for semantic YAML equality, path checks, and multi-document streams:
@@ -132,6 +132,9 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## JSON (`hammy/jsonassert`)
 
+* [x] Reader
+* [x] Bytes
+* [x] String
 * [x] ArrayContains
 * [x] ArrayContainsBytes
 * [x] Contains
