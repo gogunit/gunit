@@ -14,27 +14,32 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Equal(actual, expected string) hammy.AssertionMessage {
-	return EqualBytes([]byte(actual), []byte(expected))
+type StringAssert struct {
+	actual string
 }
 
-func EqualWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
-	return EqualBytesWithOptions([]byte(actual), []byte(expected), opts...)
+type BytesAssert struct {
+	actual []byte
 }
 
-func EqualLines(actual, expected string) hammy.AssertionMessage {
-	return EqualLinesWithOptions(actual, expected)
+type ReaderAssert struct {
+	actual io.Reader
 }
 
-func EqualLinesWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
-	return EqualLinesBytesWithOptions([]byte(actual), []byte(expected), opts...)
+func String(actual string) *StringAssert {
+	return &StringAssert{actual: actual}
 }
 
-func EqualLinesBytes(actual, expected []byte) hammy.AssertionMessage {
-	return EqualLinesBytesWithOptions(actual, expected)
+func Bytes(actual []byte) *BytesAssert {
+	return &BytesAssert{actual: actual}
 }
 
-func EqualLinesBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
+func Reader(actual io.Reader) *ReaderAssert {
+	return &ReaderAssert{actual: actual}
+}
+
+func (assert *BytesAssert) LinesEqualToWithOptions(expected []byte, opts ...Option) hammy.AssertionMessage {
+	actual := assert.actual
 	actualLines := splitJSONLines(string(actual))
 	expectedLines := splitJSONLines(string(expected))
 
@@ -71,38 +76,8 @@ func EqualLinesBytesWithOptions(actual, expected []byte, opts ...Option) hammy.A
 	return hammy.Assert(true, "JSONL mismatch (-want +got):\n")
 }
 
-func LinesContain(actual, expected string, opts ...Option) hammy.AssertionMessage {
-	return linesContain(actual, expected, opts, func(actualJSON, expectedJSON any) bool {
-		return cmp.Equal(actualJSON, expectedJSON)
-	}, "found matching JSONL line <%d>", "got no matching JSONL line")
-}
-
-func LinesContainSubset(actual, expected string, opts ...Option) hammy.AssertionMessage {
-	return linesContain(actual, expected, opts, func(actualJSON, expectedJSON any) bool {
-		ok, _ := containsJSON(actualJSON, expectedJSON, "$")
-		return ok
-	}, "found JSONL line <%d> containing expected subset", "got no JSONL line containing expected subset")
-}
-
-func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
-	actualBytes, result := readJSON("actual", actual)
-	if !result.IsSuccessful {
-		return result
-	}
-
-	expectedBytes, result := readJSON("expected", expected)
-	if !result.IsSuccessful {
-		return result
-	}
-
-	return EqualBytes(actualBytes, expectedBytes)
-}
-
-func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
-	return EqualBytesWithOptions(actual, expected)
-}
-
-func EqualBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
+func (assert *BytesAssert) EqualToWithOptions(expected []byte, opts ...Option) hammy.AssertionMessage {
+	actual := assert.actual
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
@@ -120,6 +95,80 @@ func EqualBytesWithOptions(actual, expected []byte, opts ...Option) hammy.Assert
 
 	diff := cmp.Diff(expectedJSON, actualJSON)
 	return hammy.Assert(diff == "", "JSON mismatch (-want +got):\n%s", diff)
+}
+
+func (assert *StringAssert) EqualTo(expected string, opts ...Option) hammy.AssertionMessage {
+	return assert.EqualToWithOptions(expected, opts...)
+}
+
+func (assert *StringAssert) EqualToWithOptions(expected string, opts ...Option) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).EqualToWithOptions([]byte(expected), opts...)
+}
+
+func (assert *StringAssert) LinesEqualTo(expected string) hammy.AssertionMessage {
+	return assert.LinesEqualToWithOptions(expected)
+}
+
+func (assert *StringAssert) LinesEqualToWithOptions(expected string, opts ...Option) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).LinesEqualToWithOptions([]byte(expected), opts...)
+}
+
+func (assert *StringAssert) LinesContain(expected string, opts ...Option) hammy.AssertionMessage {
+	return linesContain(assert.actual, expected, opts, func(actualJSON, expectedJSON any) bool {
+		return cmp.Equal(actualJSON, expectedJSON)
+	}, "found matching JSONL line <%d>", "got no matching JSONL line")
+}
+
+func (assert *StringAssert) LinesContainSubset(expected string, opts ...Option) hammy.AssertionMessage {
+	return linesContain(assert.actual, expected, opts, func(actualJSON, expectedJSON any) bool {
+		ok, _ := containsJSON(actualJSON, expectedJSON, "$")
+		return ok
+	}, "found JSONL line <%d> containing expected subset", "got no JSONL line containing expected subset")
+}
+
+func (assert *StringAssert) IsValid() hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).IsValid()
+}
+
+func (assert *StringAssert) Contains(expected string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).Contains([]byte(expected))
+}
+
+func (assert *BytesAssert) EqualTo(expected []byte) hammy.AssertionMessage {
+	return assert.EqualToWithOptions(expected)
+}
+
+func (assert *BytesAssert) LinesEqualTo(expected []byte) hammy.AssertionMessage {
+	return assert.LinesEqualToWithOptions(expected)
+}
+
+func (assert *BytesAssert) IsValid() hammy.AssertionMessage {
+	if _, err := parseJSON(assert.actual); err != nil {
+		return hammy.Assert(false, "JSON invalid: %v", err)
+	}
+	return hammy.Assert(true, "got valid JSON")
+}
+
+func (assert *ReaderAssert) EqualTo(expected io.Reader) hammy.AssertionMessage {
+	actualBytes, result := readJSON("actual", assert.actual)
+	if !result.IsSuccessful {
+		return result
+	}
+
+	expectedBytes, result := readJSON("expected", expected)
+	if !result.IsSuccessful {
+		return result
+	}
+
+	return Bytes(actualBytes).EqualTo(expectedBytes)
+}
+
+func (assert *ReaderAssert) IsValid() hammy.AssertionMessage {
+	actualBytes, result := readJSON("actual", assert.actual)
+	if !result.IsSuccessful {
+		return result
+	}
+	return Bytes(actualBytes).IsValid()
 }
 
 type Option func(*compareOptions)
@@ -141,30 +190,8 @@ type compareOptions struct {
 	unorderedArrayPaths []string
 }
 
-func Valid(actual string) hammy.AssertionMessage {
-	return ValidBytes([]byte(actual))
-}
-
-func ValidReader(actual io.Reader) hammy.AssertionMessage {
-	actualBytes, result := readJSON("actual", actual)
-	if !result.IsSuccessful {
-		return result
-	}
-	return ValidBytes(actualBytes)
-}
-
-func ValidBytes(actual []byte) hammy.AssertionMessage {
-	if _, err := parseJSON(actual); err != nil {
-		return hammy.Assert(false, "JSON invalid: %v", err)
-	}
-	return hammy.Assert(true, "got valid JSON")
-}
-
-func Contains(actual, expected string) hammy.AssertionMessage {
-	return ContainsBytes([]byte(actual), []byte(expected))
-}
-
-func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
+func (assert *BytesAssert) Contains(expected []byte) hammy.AssertionMessage {
+	actual := assert.actual
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
@@ -181,8 +208,8 @@ func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
 	return hammy.Assert(true, "JSON contained expected subset")
 }
 
-func PathExists(actual, path string) hammy.AssertionMessage {
-	actualJSON, err := parseJSON([]byte(actual))
+func (assert *StringAssert) PathExists(path string) hammy.AssertionMessage {
+	actualJSON, err := parseJSON([]byte(assert.actual))
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
 	}
@@ -195,8 +222,8 @@ func PathExists(actual, path string) hammy.AssertionMessage {
 	return hammy.Assert(true, "JSON path <%s> exists", path)
 }
 
-func PathMissing(actual, path string) hammy.AssertionMessage {
-	actualJSON, err := parseJSON([]byte(actual))
+func (assert *StringAssert) PathMissing(path string) hammy.AssertionMessage {
+	actualJSON, err := parseJSON([]byte(assert.actual))
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
 	}
@@ -209,11 +236,12 @@ func PathMissing(actual, path string) hammy.AssertionMessage {
 	return hammy.Assert(true, "JSON path <%s> missing", path)
 }
 
-func PathEqual(actual, path, expected string) hammy.AssertionMessage {
-	return PathEqualBytes([]byte(actual), path, []byte(expected))
+func (assert *StringAssert) PathEqual(path, expected string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).PathEqual(path, []byte(expected))
 }
 
-func PathEqualBytes(actual []byte, path string, expected []byte) hammy.AssertionMessage {
+func (assert *BytesAssert) PathEqual(path string, expected []byte) hammy.AssertionMessage {
+	actual := assert.actual
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)
@@ -236,11 +264,12 @@ func PathEqualBytes(actual []byte, path string, expected []byte) hammy.Assertion
 	return hammy.Assert(diff == "", "JSON path <%s> mismatch (-want +got):\n%s", path, diff)
 }
 
-func ArrayContains(actual, path, expectedElement string) hammy.AssertionMessage {
-	return ArrayContainsBytes([]byte(actual), path, []byte(expectedElement))
+func (assert *StringAssert) ArrayContains(path, expectedElement string) hammy.AssertionMessage {
+	return Bytes([]byte(assert.actual)).ArrayContains(path, []byte(expectedElement))
 }
 
-func ArrayContainsBytes(actual []byte, path string, expectedElement []byte) hammy.AssertionMessage {
+func (assert *BytesAssert) ArrayContains(path string, expectedElement []byte) hammy.AssertionMessage {
+	actual := assert.actual
 	actualJSON, err := parseJSON(actual)
 	if err != nil {
 		return hammy.Assert(false, "actual JSON invalid: %v", err)

@@ -59,9 +59,9 @@ Use `jsonassert` for semantic JSON equality that ignores object key order and in
 ```go
 import ja "github.com/gogunit/gunit/hammy/jsonassert"
 
-assert.Is(ja.Equal(actualJSON, expectedJSON))
-assert.Is(ja.PathEqual(actualJSON, "user.name", `"Ada"`))
-assert.Is(ja.EqualWithOptions(actualJSON, expectedJSON, ja.IgnorePaths("meta.request_id")))
+assert.Is(ja.String(actualJSON).EqualTo(expectedJSON))
+assert.Is(ja.String(actualJSON).PathEqual("user.name", `"Ada"`))
+assert.Is(ja.String(actualJSON).EqualToWithOptions(expectedJSON, ja.IgnorePaths("meta.request_id")))
 ```
 
 Use `yamlassert` for semantic YAML equality, path checks, and multi-document streams:
@@ -154,30 +154,33 @@ HTTP keeps constructor-style wrappers (`Response(resp)`, `Request(req)`, and `Re
 
 ## JSON (`hammy/jsonassert`)
 
-* [x] ArrayContains
-* [x] ArrayContainsBytes
-* [x] Contains
-* [x] ContainsBytes
-* [x] Equal
-* [x] EqualBytes
-* [x] EqualBytesWithOptions
-* [x] EqualLines
-* [x] EqualLinesBytes
-* [x] EqualLinesBytesWithOptions
-* [x] EqualLinesWithOptions
-* [x] EqualReader
-* [x] EqualWithOptions
+* [x] String
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] LinesEqualTo
+  * [x] LinesEqualToWithOptions
+  * [x] LinesContain
+  * [x] LinesContainSubset
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathExists
+  * [x] PathMissing
+  * [x] PathEqual
+  * [x] ArrayContains
+* [x] Bytes
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] LinesEqualTo
+  * [x] LinesEqualToWithOptions
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathEqual
+  * [x] ArrayContains
+* [x] Reader
+  * [x] EqualTo
+  * [x] IsValid
 * [x] IgnorePaths
-* [x] LinesContain
-* [x] LinesContainSubset
-* [x] PathEqual
-* [x] PathEqualBytes
-* [x] PathExists
-* [x] PathMissing
 * [x] UnorderedArraysAt
-* [x] Valid
-* [x] ValidBytes
-* [x] ValidReader
 
 ## YAML (`hammy/yamlassert`)
 
