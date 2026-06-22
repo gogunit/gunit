@@ -38,25 +38,19 @@ func Reader(actual io.Reader) *ReaderAssert {
 	return &ReaderAssert{actual: actual}
 }
 
-func Equal(actual, expected string) hammy.AssertionMessage {
-	return String(actual).EqualTo(expected)
-}
+func Equal(a, e string) hammy.AssertionMessage { return String(a).EqualTo(e) }
 
 func EqualWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
 	return String(actual).EqualToWithOptions(expected, opts...)
 }
 
-func EqualLines(actual, expected string) hammy.AssertionMessage {
-	return String(actual).LinesEqualTo(expected)
-}
+func EqualLines(a, e string) hammy.AssertionMessage { return String(a).LinesEqualTo(e) }
 
 func EqualLinesWithOptions(actual, expected string, opts ...Option) hammy.AssertionMessage {
 	return String(actual).LinesEqualToWithOptions(expected, opts...)
 }
 
-func EqualLinesBytes(actual, expected []byte) hammy.AssertionMessage {
-	return Bytes(actual).LinesEqualTo(expected)
-}
+func EqualLinesBytes(a, e []byte) hammy.AssertionMessage { return Bytes(a).LinesEqualTo(e) }
 
 func EqualLinesBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
 	return Bytes(actual).LinesEqualToWithOptions(expected, opts...)
@@ -108,13 +102,9 @@ func LinesContainSubset(actual, expected string, opts ...Option) hammy.Assertion
 	return String(actual).LinesContainSubset(expected, opts...)
 }
 
-func EqualReader(actual, expected io.Reader) hammy.AssertionMessage {
-	return Reader(actual).EqualTo(expected)
-}
+func EqualReader(a, e io.Reader) hammy.AssertionMessage { return Reader(a).EqualTo(e) }
 
-func EqualBytes(actual, expected []byte) hammy.AssertionMessage {
-	return Bytes(actual).EqualTo(expected)
-}
+func EqualBytes(a, e []byte) hammy.AssertionMessage { return Bytes(a).EqualTo(e) }
 
 func EqualBytesWithOptions(actual, expected []byte, opts ...Option) hammy.AssertionMessage {
 	return Bytes(actual).EqualToWithOptions(expected, opts...)
@@ -246,13 +236,9 @@ func ValidBytes(actual []byte) hammy.AssertionMessage {
 	return Bytes(actual).IsValid()
 }
 
-func Contains(actual, expected string) hammy.AssertionMessage {
-	return String(actual).Contains(expected)
-}
+func Contains(a, e string) hammy.AssertionMessage { return String(a).Contains(e) }
 
-func ContainsBytes(actual, expected []byte) hammy.AssertionMessage {
-	return Bytes(actual).Contains(expected)
-}
+func ContainsBytes(a, e []byte) hammy.AssertionMessage { return Bytes(a).Contains(e) }
 
 func (assert *BytesAssert) Contains(expected []byte) hammy.AssertionMessage {
 	actual := assert.actual
