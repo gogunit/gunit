@@ -17,12 +17,18 @@ type Req struct {
 	actual *http.Request
 }
 
+// HasMethod asserts that the request method equals expected. It is an alias for Method.
+func (r *Req) HasMethod(expected string) hammy.AssertionMessage { return r.Method(expected) }
+
 func (r *Req) Method(expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
 		return hammy.Assert(false, "got nil request, wanted method <%s>", expected)
 	}
 	return hammy.Assert(r.actual.Method == expected, "got method <%s>, wanted <%s>", r.actual.Method, expected)
 }
+
+// HasPath asserts that the request path equals expected. It is an alias for Path.
+func (r *Req) HasPath(expected string) hammy.AssertionMessage { return r.Path(expected) }
 
 func (r *Req) Path(expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
@@ -33,6 +39,9 @@ func (r *Req) Path(expected string) hammy.AssertionMessage {
 	}
 	return hammy.Assert(r.actual.URL.Path == expected, "got path <%s>, wanted <%s>", r.actual.URL.Path, expected)
 }
+
+// URLEqualTo asserts that the request URL equals expected. It is an alias for URL.
+func (r *Req) URLEqualTo(expected string) hammy.AssertionMessage { return r.URL(expected) }
 
 func (r *Req) URL(expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
@@ -49,12 +58,23 @@ func (r *Req) URLEqual(expected string) hammy.AssertionMessage {
 	return r.URL(expected)
 }
 
+// HasHost asserts that the request host equals expected. It is an alias for Host.
+func (r *Req) HasHost(expected string) hammy.AssertionMessage { return r.Host(expected) }
+
 func (r *Req) Host(expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
 		return hammy.Assert(false, "got nil request, wanted host <%s>", expected)
 	}
 	return hammy.Assert(r.actual.Host == expected, "got host <%s>, wanted <%s>", r.actual.Host, expected)
 }
+
+// HeaderEqualTo asserts that the request header equals expected. It is an alias for Header.
+func (r *Req) HeaderEqualTo(key, expected string) hammy.AssertionMessage {
+	return r.Header(key, expected)
+}
+
+// HasHeader asserts that the request header equals expected. It is an alias for Header.
+func (r *Req) HasHeader(key, expected string) hammy.AssertionMessage { return r.Header(key, expected) }
 
 func (r *Req) Header(key, expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
@@ -64,12 +84,22 @@ func (r *Req) Header(key, expected string) hammy.AssertionMessage {
 	return hammy.Assert(actual == expected, "got header <%s>=<%s>, wanted <%s>", key, actual, expected)
 }
 
+// HasHeaderContaining asserts that the request header contains expected. It is an alias for HeaderContains.
+func (r *Req) HasHeaderContaining(key, expected string) hammy.AssertionMessage {
+	return r.HeaderContains(key, expected)
+}
+
 func (r *Req) HeaderContains(key, expected string) hammy.AssertionMessage {
 	if r == nil || r.actual == nil {
 		return hammy.Assert(false, "got nil request, wanted header <%s> containing <%s>", key, expected)
 	}
 	actual := r.actual.Header.Get(key)
 	return hammy.Assert(strings.Contains(actual, expected), "got header <%s>=<%s>, wanted containing <%s>", key, actual, expected)
+}
+
+// HasQueryParam asserts that the request query parameter equals expected. It is an alias for QueryParam.
+func (r *Req) HasQueryParam(key, expected string) hammy.AssertionMessage {
+	return r.QueryParam(key, expected)
 }
 
 func (r *Req) QueryParam(key, expected string) hammy.AssertionMessage {
@@ -83,12 +113,20 @@ func (r *Req) QueryParam(key, expected string) hammy.AssertionMessage {
 	return hammy.Assert(actual == expected, "got query param <%s>=<%s>, wanted <%s>", key, actual, expected)
 }
 
+// BodyEqualTo asserts that the request body equals expected. It is an alias for BodyEqual.
+func (r *Req) BodyEqualTo(expected string) hammy.AssertionMessage { return r.BodyEqual(expected) }
+
 func (r *Req) BodyEqual(expected string) hammy.AssertionMessage {
 	actual, result := readRequestBody(r)
 	if !result.IsSuccessful {
 		return result
 	}
 	return hammy.Assert(actual == expected, "got body <%s>, wanted equal to <%s>", actual, expected)
+}
+
+// HasBodyContaining asserts that the request body contains expected. It is an alias for BodyContains.
+func (r *Req) HasBodyContaining(expected string) hammy.AssertionMessage {
+	return r.BodyContains(expected)
 }
 
 func (r *Req) BodyContains(expected string) hammy.AssertionMessage {

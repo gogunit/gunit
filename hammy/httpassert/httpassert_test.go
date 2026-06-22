@@ -157,13 +157,19 @@ func Test_BodyMatchesRegexp_failure_invalid_pattern(t *testing.T) {
 	aSpy.HadErrorContaining(t, "invalid regexp <(>")
 }
 
-func Test_Body_assertions_restore_body(t *testing.T) {
+func Test_Body_assertion_restores_body(t *testing.T) {
 	assert := hammy.New(t)
 	resp := newResponse(http.StatusOK, nil, "hello world")
 
 	assert.Is(httpassert.Response(resp).BodyContains("hello"))
-	assert.Is(httpassert.Response(resp).BodyEqual("hello world"))
-	assert.Is(httpassert.Response(resp).BodyMatchesRegexp(`world$`))
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read restored body: %v", err)
+	}
+	if string(body) != "hello world" {
+		t.Fatalf("got restored body %q, wanted %q", string(body), "hello world")
+	}
 }
 
 func Test_Body_assertion_failure_nil_response(t *testing.T) {
@@ -217,4 +223,60 @@ func Test_Response_methods_failure_nil_receiver(t *testing.T) {
 	assert := hammy.New(aSpy)
 	assert.Is(result)
 	aSpy.HadErrorContaining(t, "got nil response")
+}
+
+func Test_Response_HasStatus_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "")
+
+	assert.Is(httpassert.Response(resp).HasStatus(http.StatusOK))
+}
+
+func Test_Response_HasStatusInRange_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "")
+
+	assert.Is(httpassert.Response(resp).HasStatusInRange(200, 299))
+}
+
+func Test_Response_HeaderEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Response(resp).HeaderEqualTo("Content-Type", "application/json; charset=utf-8"))
+}
+
+func Test_Response_HasHeader_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Response(resp).HasHeader("Content-Type", "application/json; charset=utf-8"))
+}
+
+func Test_Response_HasHeaderContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, http.Header{"Content-Type": {"application/json; charset=utf-8"}}, "")
+
+	assert.Is(httpassert.Response(resp).HasHeaderContaining("Content-Type", "application/json"))
+}
+
+func Test_Response_BodyEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Response(resp).BodyEqualTo("status 204"))
+}
+
+func Test_Response_HasBodyContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Response(resp).HasBodyContaining("204"))
+}
+
+func Test_Response_BodyMatches_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	resp := newResponse(http.StatusOK, nil, "status 204")
+
+	assert.Is(httpassert.Response(resp).BodyMatches(`status \d+`))
 }

@@ -43,14 +43,15 @@ Use `Match` when no typed wrapper fits or when the value is intentionally held a
 
 ## Dedicated Packages
 
-Use `httpassert` for assertions on `*http.Response` values:
+Use `httpassert` for assertions on `*http.Response` values. HTTP assertions use the constructor-style API: wrap the actual value once, then call assertion methods on the returned struct. This is also the preferred model for JSON/YAML constructor-style refactors because the actual value is stored by the wrapper.
 
 ```go
 import ha "github.com/gogunit/gunit/hammy/httpassert"
 
-assert.Is(ha.Status(resp, http.StatusOK))
-assert.Is(ha.Header(resp, "Content-Type", "application/json"))
-assert.Is(ha.BodyContains(resp, `"ok":true`))
+response := ha.Response(resp)
+assert.Is(response.HasStatus(http.StatusOK))
+assert.Is(response.HeaderEqualTo("Content-Type", "application/json"))
+assert.Is(response.HasBodyContaining(`"ok":true`))
 ```
 
 Use `jsonassert` for semantic JSON equality that ignores object key order and insignificant whitespace:
@@ -122,13 +123,34 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## HTTP (`hammy/httpassert`)
 
+HTTP keeps constructor-style wrappers (`Response(resp)`, `Request(req)`, and `Recorder(rec)`) so actual HTTP values live in assertion structs while methods remain chainable and backward-compatible.
+
 * [x] BodyContains
 * [x] BodyEqual
+* [x] BodyEqualTo
+* [x] BodyMatches
 * [x] BodyMatchesRegexp
 * [x] Header
 * [x] HeaderContains
+* [x] HeaderEqualTo
+* [x] HasBodyContaining
+* [x] HasHeader
+* [x] HasHeaderContaining
+* [x] HasHost
+* [x] HasMethod
+* [x] HasPath
+* [x] HasQueryParam
+* [x] HasStatus
+* [x] HasStatusInRange
+* [x] Host
+* [x] Method
+* [x] Path
+* [x] QueryParam
 * [x] Status
 * [x] StatusInRange
+* [x] URL
+* [x] URLEqual
+* [x] URLEqualTo
 
 ## JSON (`hammy/jsonassert`)
 

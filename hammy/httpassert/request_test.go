@@ -61,6 +61,12 @@ func Test_Request_URL_success(t *testing.T) {
 	req := newRequest(http.MethodGet, "https://example.com/widgets/1?expand=true", "")
 
 	assert.Is(httpassert.Request(req).URL("https://example.com/widgets/1?expand=true"))
+}
+
+func Test_Request_URLEqual_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodGet, "https://example.com/widgets/1?expand=true", "")
+
 	assert.Is(httpassert.Request(req).URLEqual("https://example.com/widgets/1?expand=true"))
 }
 
@@ -189,12 +195,19 @@ func Test_Request_BodyContains_failure(t *testing.T) {
 	aSpy.HadErrorContaining(t, "got body <hello world>, wanted containing <goodbye>")
 }
 
-func Test_Request_Body_assertions_restore_body(t *testing.T) {
+func Test_Request_Body_assertion_restores_body(t *testing.T) {
 	assert := hammy.New(t)
 	req := newRequest(http.MethodPost, "https://example.com/widgets", "hello world")
 
 	assert.Is(httpassert.Request(req).BodyContains("hello"))
-	assert.Is(httpassert.Request(req).BodyEqual("hello world"))
+
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		t.Fatalf("read restored body: %v", err)
+	}
+	if string(body) != "hello world" {
+		t.Fatalf("got restored body %q, wanted %q", string(body), "hello world")
+	}
 }
 
 func Test_Request_Body_assertion_failure_nil_request(t *testing.T) {
@@ -244,4 +257,77 @@ func (requestErrorReadCloser) Read([]byte) (int, error) {
 
 func (requestErrorReadCloser) Close() error {
 	return nil
+}
+
+func Test_Request_HasMethod_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+
+	assert.Is(httpassert.Request(req).HasMethod(http.MethodPost))
+}
+
+func Test_Request_HasPath_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+
+	assert.Is(httpassert.Request(req).HasPath("/widgets/1"))
+}
+
+func Test_Request_URLEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+
+	assert.Is(httpassert.Request(req).URLEqualTo("https://example.com/widgets/1?expand=true"))
+}
+
+func Test_Request_HasHost_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+
+	assert.Is(httpassert.Request(req).HasHost("example.com"))
+}
+
+func Test_Request_HeaderEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+	req.Header.Set("Accept", "application/json; charset=utf-8")
+
+	assert.Is(httpassert.Request(req).HeaderEqualTo("Accept", "application/json; charset=utf-8"))
+}
+
+func Test_Request_HasHeader_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+	req.Header.Set("Accept", "application/json; charset=utf-8")
+
+	assert.Is(httpassert.Request(req).HasHeader("Accept", "application/json; charset=utf-8"))
+}
+
+func Test_Request_HasHeaderContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+	req.Header.Set("Accept", "application/json; charset=utf-8")
+
+	assert.Is(httpassert.Request(req).HasHeaderContaining("Accept", "application/json"))
+}
+
+func Test_Request_HasQueryParam_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "")
+
+	assert.Is(httpassert.Request(req).HasQueryParam("expand", "true"))
+}
+
+func Test_Request_BodyEqualTo_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "hello world")
+
+	assert.Is(httpassert.Request(req).BodyEqualTo("hello world"))
+}
+
+func Test_Request_HasBodyContaining_alias_success(t *testing.T) {
+	assert := hammy.New(t)
+	req := newRequest(http.MethodPost, "https://example.com/widgets/1?expand=true", "hello world")
+
+	assert.Is(httpassert.Request(req).HasBodyContaining("world"))
 }
