@@ -8,7 +8,7 @@ import (
 	"github.com/gogunit/gunit/hammy/jsonassert"
 )
 
-func ExampleEqual() {
+func ExampleStringAssert_EqualTo() {
 	actual := `{"name":"Ada","age":37}`
 	expected := `{
 		"name": "Ada",
@@ -21,7 +21,7 @@ func ExampleEqual() {
 	// success=true
 }
 
-func ExampleEqual_reorderedObjectKeys() {
+func ExampleStringAssert_EqualTo_reorderedObjectKeys() {
 	actual := `{"name":"Ada","age":37}`
 	expected := `{"age":37,"name":"Ada"}`
 
@@ -31,7 +31,7 @@ func ExampleEqual_reorderedObjectKeys() {
 	// success=true
 }
 
-func ExampleEqualWithOptions() {
+func ExampleStringAssert_EqualToWithOptions() {
 	actual := `{"status":"ok","meta":{"request_id":"abc"}}`
 	expected := `{"status":"ok","meta":{"request_id":"xyz"}}`
 
@@ -41,7 +41,7 @@ func ExampleEqualWithOptions() {
 	// success=true
 }
 
-func ExampleEqualLines() {
+func ExampleStringAssert_LinesEqualTo() {
 	actual := `{"name":"Ada","age":37}` + "\n" + `{"name":"Grace","age":85}`
 	expected := `{"age":37.0,"name":"Ada"}` + "\n" + `{"age":85.0,"name":"Grace"}`
 
@@ -51,7 +51,7 @@ func ExampleEqualLines() {
 	// success=true
 }
 
-func ExampleEqualLinesWithOptions() {
+func ExampleStringAssert_LinesEqualToWithOptions() {
 	actual := `{"status":"ok","meta":{"request_id":"abc"}}` + "\n" + `{"status":"ok","meta":{"request_id":"def"}}`
 	expected := `{"status":"ok","meta":{"request_id":"uvw"}}` + "\n" + `{"status":"ok","meta":{"request_id":"xyz"}}`
 
@@ -61,7 +61,7 @@ func ExampleEqualLinesWithOptions() {
 	// success=true
 }
 
-func ExampleEqualLinesBytes() {
+func ExampleBytesAssert_LinesEqualTo() {
 	actual := []byte(`{"id":1}` + "\n" + `{"id":2}`)
 	expected := []byte(`{"id":1.0}` + "\n" + `{"id":2.0}`)
 
@@ -71,7 +71,7 @@ func ExampleEqualLinesBytes() {
 	// success=true
 }
 
-func ExampleEqualLinesBytesWithOptions() {
+func ExampleBytesAssert_LinesEqualToWithOptions() {
 	actual := []byte(`{"tags":["go","test"]}` + "\n" + `{"tags":["json","assert"]}`)
 	expected := []byte(`{"tags":["test","go"]}` + "\n" + `{"tags":["assert","json"]}`)
 
@@ -81,7 +81,7 @@ func ExampleEqualLinesBytesWithOptions() {
 	// success=true
 }
 
-func ExampleEqualBytes() {
+func ExampleBytesAssert_EqualTo() {
 	actual := []byte(`{"one":1}`)
 	expected := []byte(`{"one":1.0}`)
 
@@ -91,7 +91,7 @@ func ExampleEqualBytes() {
 	// success=true
 }
 
-func ExampleEqualBytesWithOptions() {
+func ExampleBytesAssert_EqualToWithOptions() {
 	actual := []byte(`{"tags":["go","test"]}`)
 	expected := []byte(`{"tags":["test","go"]}`)
 
@@ -101,7 +101,7 @@ func ExampleEqualBytesWithOptions() {
 	// success=true
 }
 
-func ExampleEqualReader() {
+func ExampleReaderAssert_EqualTo() {
 	actual := strings.NewReader(`{"one":1}`)
 	expected := strings.NewReader(`{"one":1.0}`)
 
@@ -111,28 +111,28 @@ func ExampleEqualReader() {
 	// success=true
 }
 
-func ExampleValid() {
+func ExampleStringAssert_IsValid() {
 	printExample(jsonassert.String(`{"name":"Ada"}`).IsValid())
 	// Output:
 	// message="got valid JSON"
 	// success=true
 }
 
-func ExampleValidBytes() {
+func ExampleBytesAssert_IsValid() {
 	printExample(jsonassert.Bytes([]byte(`{"name":"Ada"}`)).IsValid())
 	// Output:
 	// message="got valid JSON"
 	// success=true
 }
 
-func ExampleValidReader() {
+func ExampleReaderAssert_IsValid() {
 	printExample(jsonassert.Reader(strings.NewReader(`{"name":"Ada"}`)).IsValid())
 	// Output:
 	// message="got valid JSON"
 	// success=true
 }
 
-func ExampleContains() {
+func ExampleStringAssert_Contains() {
 	actual := `{"status":"ok","meta":{"page":1,"request_id":"abc"}}`
 	expected := `{"meta":{"page":1.0}}`
 
@@ -142,7 +142,7 @@ func ExampleContains() {
 	// success=true
 }
 
-func ExampleContainsBytes() {
+func ExampleBytesAssert_Contains() {
 	actual := []byte(`{"status":"ok","extra":true}`)
 	expected := []byte(`{"status":"ok"}`)
 
@@ -152,7 +152,7 @@ func ExampleContainsBytes() {
 	// success=true
 }
 
-func ExampleLinesContain() {
+func ExampleStringAssert_LinesContain() {
 	actual := `{"id":1,"name":"Ada"}` + "\n" + `{"id":2,"name":"Grace"}`
 
 	printExample(jsonassert.String(actual).LinesContain(`{"name":"Grace","id":2.0}`))
@@ -161,7 +161,7 @@ func ExampleLinesContain() {
 	// success=true
 }
 
-func ExampleLinesContainSubset() {
+func ExampleStringAssert_LinesContainSubset() {
 	actual := `{"status":"ok","meta":{"page":1,"request_id":"abc"}}` + "\n" + `{"status":"done"}`
 
 	printExample(jsonassert.String(actual).LinesContainSubset(`{"meta":{"page":1.0}}`))
@@ -170,28 +170,28 @@ func ExampleLinesContainSubset() {
 	// success=true
 }
 
-func ExamplePathExists() {
+func ExampleStringAssert_PathExists() {
 	printExample(jsonassert.String(`{"user":{"name":"Ada"}}`).PathExists("user.name"))
 	// Output:
 	// message="JSON path <user.name> exists"
 	// success=true
 }
 
-func ExamplePathMissing() {
+func ExampleStringAssert_PathMissing() {
 	printExample(jsonassert.String(`{"user":{"name":"Ada"}}`).PathMissing("user.email"))
 	// Output:
 	// message="JSON path <user.email> missing"
 	// success=true
 }
 
-func ExamplePathEqual() {
+func ExampleStringAssert_PathEqual() {
 	printExample(jsonassert.String(`{"user":{"age":37}}`).PathEqual("user.age", `37.0`))
 	// Output:
 	// message="JSON path <user.age> mismatch (-want +got):\n"
 	// success=true
 }
 
-func ExamplePathEqualBytes() {
+func ExampleBytesAssert_PathEqual() {
 	actual := []byte(`{"user":{"name":"Ada"}}`)
 	expected := []byte(`"Ada"`)
 
@@ -201,7 +201,7 @@ func ExamplePathEqualBytes() {
 	// success=true
 }
 
-func ExampleArrayContains() {
+func ExampleStringAssert_ArrayContains() {
 	actual := `{"items":[{"id":1},{"id":2}]}`
 
 	printExample(jsonassert.String(actual).ArrayContains("items", `{"id":2.0}`))
@@ -210,7 +210,7 @@ func ExampleArrayContains() {
 	// success=true
 }
 
-func ExampleArrayContainsBytes() {
+func ExampleBytesAssert_ArrayContains() {
 	actual := []byte(`{"items":[1,2]}`)
 	expected := []byte(`2.0`)
 

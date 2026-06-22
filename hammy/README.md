@@ -132,33 +132,33 @@ func Test_payload_has_expected_type(t *testing.T) {
 
 ## JSON (`hammy/jsonassert`)
 
-* [x] Reader
-* [x] Bytes
 * [x] String
-* [x] ArrayContains
-* [x] ArrayContainsBytes
-* [x] Contains
-* [x] ContainsBytes
-* [x] Equal
-* [x] EqualBytes
-* [x] EqualBytesWithOptions
-* [x] EqualLines
-* [x] EqualLinesBytes
-* [x] EqualLinesBytesWithOptions
-* [x] EqualLinesWithOptions
-* [x] EqualReader
-* [x] EqualWithOptions
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] LinesEqualTo
+  * [x] LinesEqualToWithOptions
+  * [x] LinesContain
+  * [x] LinesContainSubset
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathExists
+  * [x] PathMissing
+  * [x] PathEqual
+  * [x] ArrayContains
+* [x] Bytes
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] LinesEqualTo
+  * [x] LinesEqualToWithOptions
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathEqual
+  * [x] ArrayContains
+* [x] Reader
+  * [x] EqualTo
+  * [x] IsValid
 * [x] IgnorePaths
-* [x] LinesContain
-* [x] LinesContainSubset
-* [x] PathEqual
-* [x] PathEqualBytes
-* [x] PathExists
-* [x] PathMissing
 * [x] UnorderedArraysAt
-* [x] Valid
-* [x] ValidBytes
-* [x] ValidReader
 
 ## YAML (`hammy/yamlassert`)
 
