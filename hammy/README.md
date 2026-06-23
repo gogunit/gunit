@@ -43,7 +43,7 @@ Use `Match` when no typed wrapper fits or when the value is intentionally held a
 
 ## Dedicated Packages
 
-Use `httpassert` for assertions on `*http.Response` values. HTTP assertions use the constructor-style API: wrap the actual value once, then call assertion methods on the returned struct. This is also the preferred model for JSON/YAML constructor-style refactors because the actual value is stored by the wrapper.
+Use `httpassert` for assertions on `*http.Response` values. HTTP, JSON, and YAML assertions all use the constructor-style API: wrap the actual value once, then call assertion methods on the returned struct.
 
 ```go
 import ha "github.com/gogunit/gunit/hammy/httpassert"
@@ -184,32 +184,33 @@ HTTP keeps constructor-style wrappers (`Response(resp)`, `Request(req)`, and `Re
 
 ## YAML (`hammy/yamlassert`)
 
-* [x] Bytes
-* [x] Bytes.ArrayContains
-* [x] Bytes.Contains
-* [x] Bytes.DocumentContains
-* [x] Bytes.DocumentCount
-* [x] Bytes.DocumentEqual
-* [x] Bytes.EqualTo
-* [x] Bytes.EqualToWithOptions
-* [x] Reader
-* [x] Reader.EqualTo
-* [x] Reader.IsValid
 * [x] String
-* [x] String.ArrayContains
-* [x] String.Contains
-* [x] String.DocumentContains
-* [x] String.DocumentCount
-* [x] String.DocumentEqual
-* [x] String.EqualTo
-* [x] String.EqualToWithOptions
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathExists
+  * [x] PathMissing
+  * [x] PathEqual
+  * [x] ArrayContains
+  * [x] DocumentCount
+  * [x] DocumentEqual
+  * [x] DocumentContains
+* [x] Bytes
+  * [x] EqualTo
+  * [x] EqualToWithOptions
+  * [x] IsValid
+  * [x] Contains
+  * [x] PathEqual
+  * [x] ArrayContains
+  * [x] DocumentCount
+  * [x] DocumentEqual
+  * [x] DocumentContains
+* [x] Reader
+  * [x] EqualTo
+  * [x] IsValid
 * [x] IgnorePaths
-* [x] String.PathEqual
-* [x] String.PathExists
-* [x] String.PathMissing
 * [x] UnorderedArraysAt
-* [x] String.IsValid
-* [x] Bytes.IsValid
 
 ## Number
 
