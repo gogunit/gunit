@@ -43,7 +43,7 @@ Use `Match` when no typed wrapper fits or when the value is intentionally held a
 
 ## Dedicated Packages
 
-Use `httpassert` for assertions on `*http.Response` values. HTTP, JSON, and YAML assertions all use the constructor-style API: wrap the actual value once, then call assertion methods on the returned struct.
+Use `htmlassert` for semantic DOM equality, structural fragments, CSS selectors, normalized text, and element attributes; use `httpassert` for assertions on `*http.Response` values. HTTP, JSON, and YAML assertions all use the constructor-style API: wrap the actual value once, then call assertion methods on the returned struct.
 
 ```go
 import ha "github.com/gogunit/gunit/hammy/httpassert"
@@ -151,6 +151,33 @@ HTTP keeps constructor-style wrappers (`Response(resp)`, `Request(req)`, and `Re
 * [x] URL
 * [x] URLEqual
 * [x] URLEqualTo
+
+## HTML (`hammy/htmlassert`)
+
+HTML assertions parse documents with the HTML5 parser, so they intentionally do not expose an `IsValid` assertion: the parser recovers from malformed markup by design. `String`, `Bytes`, and `Reader` provide the same focused assertion inventory. Selector-based text and attribute assertions require exactly one matching element.
+
+The package uses `golang.org/x/net/html` for HTML5 parsing and Cascadia for CSS selector matching. Cascadia adds no transitive module beyond `golang.org/x/net`, which this package already requires for parsing; it is kept as a small, pinned dependency rather than maintaining a partial selector engine in this repository.
+
+* [x] EqualTo
+* [x] HasSelector
+* [x] NoSelector
+* [x] SelectorCount
+* [x] TextEqualTo
+* [x] TextContains
+* [x] AttributeEqualTo
+* [x] HasAttribute
+* [x] NoAttribute
+* [x] Contains
+
+```go
+import hta "github.com/gogunit/gunit/hammy/htmlassert"
+
+page := hta.String(body)
+assert.Is(page.HasSelector("main article"))
+assert.Is(page.TextContains("h1", "Welcome"))
+assert.Is(page.AttributeEqualTo("form", "method", "post"))
+assert.Is(page.SelectorCount("nav a", 3))
+```
 
 ## JSON (`hammy/jsonassert`)
 

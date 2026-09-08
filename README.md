@@ -122,4 +122,14 @@ func Test_dynamic_payload_has_expected_type(t *testing.T) {
 }
 ```
 
+For semantic HTML assertions, wrap a document or fragment with `htmlassert.String`:
+
+```go
+import "github.com/gogunit/gunit/hammy/htmlassert"
+
+page := htmlassert.String(`<main><h1>Welcome</h1></main>`)
+assert.Is(page.HasSelector("main > h1"))
+assert.Is(page.TextEqualTo("h1", "Welcome"))
+```
+
 For more Hammy examples and the matcher reference, see [hammy/README.md](hammy/README.md).
