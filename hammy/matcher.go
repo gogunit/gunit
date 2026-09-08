@@ -100,7 +100,7 @@ func Describe[T any](msg string, matcher Matcher[T]) Matcher[T] {
 			return result
 		}
 		if result.Message == "" {
-			return Assert(false, msg)
+			return Assert(false, "%s", msg)
 		}
 		return Assert(false, "%s: %s", msg, result.Message)
 	})
@@ -229,7 +229,7 @@ func SamePointer[T any](expected *T) Matcher[*T] {
 }
 
 func TypeOf[T any]() Matcher[any] {
-	expectedType := reflect.TypeOf((*T)(nil)).Elem()
+	expectedType := reflect.TypeFor[T]()
 	return MatchFunc(func(actual any) AssertionMessage {
 		if actual == nil {
 			return Assert(false, "got <nil>, wanted dynamic type <%s>", expectedType)
@@ -241,7 +241,7 @@ func TypeOf[T any]() Matcher[any] {
 }
 
 func AssignableTo[T any]() Matcher[any] {
-	expectedType := reflect.TypeOf((*T)(nil)).Elem()
+	expectedType := reflect.TypeFor[T]()
 	return MatchFunc(func(actual any) AssertionMessage {
 		if actual == nil {
 			return Assert(false, "got <nil>, wanted assignable to <%s>", expectedType)
