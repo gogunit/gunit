@@ -133,3 +133,32 @@ assert.Is(page.TextEqualTo("h1", "Welcome"))
 ```
 
 For more Hammy examples and the matcher reference, see [hammy/README.md](hammy/README.md).
+
+## Eye Examples
+
+Use `eye.Recorder[T]` to observe calls to a fake or callback. Choose a type
+for one call, using a struct for multiple arguments and `struct{}` when
+only the call count matters. Call `Record` inside the fake or callback.
+
+```go
+import (
+	"github.com/gogunit/gunit/eye"
+	a "github.com/gogunit/gunit/hammy"
+)
+
+// Inside a test:
+var sent eye.Recorder[string]
+send := func(message string) { sent.Record(message) }
+
+assert := a.New(t)
+assert.Is(a.Number(sent.Len()).EqualTo(0))
+
+send("ready")
+
+// EqualTo compares the whole call history, so a duplicate call fails.
+assert.Is(a.Slice(sent.Calls()).EqualTo("ready"))
+```
+
+Use `a.Number(recorder.Len()).GreaterThan(0)` to check that a call happened
+at least once. To match individual arguments on exactly one call, take one
+snapshot with `Calls()`, require a length of one, then match the first value.
